@@ -52,13 +52,62 @@
       <span>Menata rak sastra...</span>
     </div>
 
-    <div v-else-if="filteredBooks.length > 0" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      <BookCard
-        v-for="b in filteredBooks"
-        :key="b.id"
-        :book="b"
-        @select-book="$emit('select-book', b)"
-      />
+    <div v-else-if="filteredBooks.length > 0">
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <BookCard
+          v-for="b in paginatedBooks"
+          :key="b.id"
+          :book="b"
+          @select-book="$emit('select-book', b)"
+        />
+      </div>
+
+      <!-- Pagination Controls -->
+      <div v-if="totalPages > 1" class="mt-10 pt-6 border-t border-surface-container flex flex-col sm:flex-row items-center justify-between gap-4">
+        <p class="text-xs text-on-surface-variant order-2 sm:order-1">
+          Menampilkan <span class="font-semibold text-primary">{{ (currentPage - 1) * pageSize + 1 }}</span> – <span class="font-semibold text-primary">{{ Math.min(currentPage * pageSize, filteredBooks.length) }}</span> dari <span class="font-semibold text-primary">{{ filteredBooks.length }}</span> karya sastra
+        </p>
+
+        <div class="inline-flex items-center gap-2 order-1 sm:order-2">
+          <!-- Previous Button -->
+          <button
+            type="button"
+            @click="goToPage(currentPage - 1)"
+            :disabled="currentPage === 1"
+            class="px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1 transition-all border"
+            :class="currentPage === 1 ? 'opacity-40 cursor-not-allowed border-surface-container text-outline' : 'bg-surface-container-lowest border-surface-container-high hover:bg-surface-container text-on-surface hover:text-primary shadow-subtle'"
+          >
+            <span class="material-symbols-outlined text-sm">chevron_left</span>
+            <span>Sebelumnya</span>
+          </button>
+
+          <!-- Page Indicator Numbers -->
+          <div class="flex items-center gap-1">
+            <button
+              v-for="p in totalPages"
+              :key="p"
+              type="button"
+              @click="goToPage(p)"
+              class="w-8 h-8 rounded-xl text-xs font-bold transition-all flex items-center justify-center"
+              :class="currentPage === p ? 'bg-primary text-white shadow-subtle' : 'bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container border border-surface-container-high'"
+            >
+              {{ p }}
+            </button>
+          </div>
+
+          <!-- Next Button -->
+          <button
+            type="button"
+            @click="goToPage(currentPage + 1)"
+            :disabled="currentPage === totalPages"
+            class="px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1 transition-all border"
+            :class="currentPage === totalPages ? 'opacity-40 cursor-not-allowed border-surface-container text-outline' : 'bg-primary text-white hover:bg-primary-container shadow-subtle'"
+          >
+            <span>Berikutnya</span>
+            <span class="material-symbols-outlined text-sm">chevron_right</span>
+          </button>
+        </div>
+      </div>
     </div>
 
     <div v-else class="text-center py-16 bg-surface-container-low rounded-2xl border border-surface-container-high p-8">
@@ -95,13 +144,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 
 defineEmits(['select-book'])
 
 const books = ref<any[]>([])
 const isLoading = ref(true)
 const activeSubFilter = ref('Semua Sastra')
+
+const currentPage = ref(1)
+const pageSize = 8
 
 const filteredBooks = computed(() => {
   return books.value.filter((b) => {
@@ -116,6 +168,25 @@ const filteredBooks = computed(() => {
     }
     return true
   })
+})
+
+const totalPages = computed(() => {
+  return Math.ceil(filteredBooks.value.length / pageSize) || 1
+})
+
+const paginatedBooks = computed(() => {
+  const start = (currentPage.value - 1) * pageSize
+  return filteredBooks.value.slice(start, start + pageSize)
+})
+
+const goToPage = (page: number) => {
+  if (page < 1 || page > totalPages.value) return
+  currentPage.value = page
+  window.scrollTo({ top: 380, behavior: 'smooth' })
+}
+
+watch(activeSubFilter, () => {
+  currentPage.value = 1
 })
 
 onMounted(async () => {
