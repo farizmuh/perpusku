@@ -1,31 +1,17 @@
-import prisma from '../../utils/prisma'
-import { initialCategories } from '../../utils/seedData'
+import { getAllCategories } from '../../utils/categoriesRepository'
 
 export default defineEventHandler(async () => {
   try {
-    const categories = await prisma.category.findMany({
-      include: {
-        _count: {
-          select: { books: true }
-        }
-      },
-      orderBy: { name: 'asc' }
-    })
-
-    if (categories.length > 0) {
-      return {
-        success: true,
-        source: 'database',
-        data: categories
-      }
+    const categories = await getAllCategories()
+    return {
+      success: true,
+      total: categories.length,
+      data: categories
     }
-  } catch (error: any) {
-    console.warn('Prisma categories query fallback:', error.message)
-  }
-
-  return {
-    success: true,
-    source: 'seed-catalog',
-    data: initialCategories
+  } catch (err: any) {
+    return createError({
+      statusCode: 500,
+      statusMessage: err.message || 'Gagal memuat kategori genre'
+    })
   }
 })

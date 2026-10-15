@@ -5,20 +5,21 @@
         <!-- Col 1: Identity & Accreditation -->
         <div class="lg:col-span-2 space-y-4">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg bg-primary-container text-on-primary flex items-center justify-center font-serif font-bold text-xl">
-              <span class="material-symbols-outlined text-2xl text-secondary-container">local_library</span>
+            <div class="w-10 h-10 rounded-lg bg-primary-container text-on-primary flex items-center justify-center font-serif font-bold text-xl overflow-hidden shrink-0">
+              <img v-if="settings.brandLogoUrl" :src="settings.brandLogoUrl" :alt="settings.brandName" class="w-full h-full object-cover" />
+              <span v-else class="material-symbols-outlined text-2xl text-secondary-container">local_library</span>
             </div>
             <div>
-              <h3 class="font-serif font-bold text-lg text-white">Perpustakaan Universitas</h3>
-              <p class="text-xs text-on-tertiary-container uppercase tracking-wider font-semibold">Gedung Pusat Pembelajaran & Riset</p>
+              <h3 class="font-serif font-bold text-lg text-white">{{ settings.brandName }}</h3>
+              <p class="text-xs text-on-tertiary-container uppercase tracking-wider font-semibold">{{ settings.footerBuilding }}</p>
             </div>
           </div>
           <p class="text-sm text-on-tertiary-container leading-relaxed max-w-sm">
-            Menyediakan akses komprehensif ke repositori ilmiah terbuka, koleksi monograf terlengkap, pangkalan data jurnal terindeks Scopus & SINTA, serta ruang kolaboratif digital.
+            {{ settings.footerDescription }}
           </p>
           <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-tertiary-container text-secondary-fixed text-xs font-semibold">
             <span class="material-symbols-outlined text-sm">verified</span>
-            <span>Terakreditasi "A" - Perpustakaan Nasional RI</span>
+            <span>{{ settings.footerAccreditation }}</span>
           </div>
         </div>
 
@@ -58,15 +59,19 @@
           <ul class="space-y-2.5 text-xs text-on-tertiary-container">
             <li class="flex items-start gap-2">
               <span class="material-symbols-outlined text-sm text-secondary-fixed shrink-0 mt-0.5">location_on</span>
-              <span>Gedung Perpustakaan Pusat Lt. 1-4, Kampus Terpadu</span>
+              <span>{{ settings.footerAddress }}</span>
             </li>
             <li class="flex items-center gap-2">
               <span class="material-symbols-outlined text-sm text-secondary-fixed shrink-0">mail</span>
-              <span>library@univ.ac.id</span>
+              <span>{{ settings.footerEmail }}</span>
             </li>
             <li class="flex items-center gap-2">
               <span class="material-symbols-outlined text-sm text-secondary-fixed shrink-0">call</span>
-              <span>(021) 786-3450 ext. 201</span>
+              <span>{{ settings.footerPhone }}</span>
+            </li>
+            <li class="flex items-center gap-2 pt-1 border-t border-tertiary-container/40">
+              <span class="material-symbols-outlined text-sm text-secondary-fixed shrink-0">schedule</span>
+              <span class="text-[11px]">{{ settings.operationalHoursWeekdays }}</span>
             </li>
           </ul>
         </div>
@@ -75,7 +80,7 @@
       <!-- Bottom Bar -->
       <div class="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-on-tertiary-container gap-4">
         <div>
-          &copy; {{ new Date().getFullYear() }} Perpustakaan Universitas. Hak Cipta Dilindungi Undang-Undang.
+          {{ settings.footerCopyright }}
         </div>
         <div class="flex items-center gap-6">
           <a href="#" class="hover:text-white transition-colors">Kebijakan Privasi</a>
@@ -86,3 +91,7 @@
     </div>
   </footer>
 </template>
+
+<script setup lang="ts">
+const { settings } = useSiteSettings()
+</script>

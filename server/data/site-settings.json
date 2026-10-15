@@ -1,0 +1,23 @@
+{
+  "operationalHoursWeekdays": "Senin - Jumat: 08.00 - 20.00",
+  "operationalHoursWeekends": "Sabtu: 08.00 - 16.00 WIB",
+  "announcementText": "Digital Repository • E-Journal Terindeks • Akses Database Riset Kampus",
+  "showAnnouncement": true,
+  "brandName": "Perpustakaan Universitas",
+  "brandSubtitle": "Knowledge & Research Hub",
+  "brandLogoUrl": "",
+  "attendanceFormUrl": "https://forms.gle/sample-presensi-kunjungan",
+  "attendanceButtonText": "Presensi Kunjungan",
+  "heroBadgeText": "Pusat Literasi, Riset, & Inovasi Akademik Sivitas",
+  "heroBadgeIcon": "verified",
+  "heroHeadline": "Eksplorasi Cakrawala Ilmu & Koleksi Pustaka Terbaik Kampus",
+  "heroSubheadline": "Akses lebih dari 120.000 judul monograf, jurnal ilmiah internasional terindeks, dan ruang belajar modern untuk menunjang keunggulan riset sivitas akademika.",
+  "heroPopularKeywords": "Metodologi Penelitian, Artificial Intelligence, Bumi Manusia, Hukum Perdata, Macroeconomics",
+  "footerDescription": "Menyediakan akses komprehensif ke repositori ilmiah terbuka, koleksi monograf terlengkap, pangkalan data jurnal terindeks Scopus & SINTA, serta ruang kolaboratif digital.",
+  "footerAccreditation": "Terakreditasi \"A\" - Perpustakaan Nasional RI",
+  "footerBuilding": "Gedung Pusat Pembelajaran & Riset",
+  "footerAddress": "Gedung Perpustakaan Pusat, Kampus Terpadu, Jl. Universitas No. 1",
+  "footerPhone": "+62 21 7890 1234",
+  "footerEmail": "perpustakaan@univ.ac.id",
+  "footerCopyright": "© 2026 Perpustakaan Universitas. Seluruh hak cipta dilindungi undang-undang."
+}

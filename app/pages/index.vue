@@ -5,16 +5,16 @@
       <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center">
         <!-- University Badge -->
         <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-fixed text-primary font-semibold text-xs tracking-wider uppercase shadow-subtle mb-6">
-          <span class="material-symbols-outlined text-sm">verified</span>
-          <span>Pusat Literasi, Riset, & Inovasi Akademik Sivitas</span>
+          <span class="material-symbols-outlined text-sm">{{ settings.heroBadgeIcon || 'verified' }}</span>
+          <span>{{ settings.heroBadgeText }}</span>
         </div>
 
         <!-- Headline & Subheadline -->
         <h1 class="font-serif font-bold text-3xl sm:text-4xl md:text-5xl text-primary tracking-tight leading-tight max-w-4xl mb-6">
-          Eksplorasi Cakrawala Ilmu & Koleksi Pustaka Terbaik Kampus
+          {{ settings.heroHeadline }}
         </h1>
         <p class="text-sm sm:text-base md:text-lg text-on-surface-variant max-w-2xl leading-relaxed mb-8">
-          Akses lebih dari 120.000 judul monograf, jurnal ilmiah internasional terindeks, dan ruang belajar modern untuk menunjang keunggulan riset sivitas akademika.
+          {{ settings.heroSubheadline }}
         </p>
 
         <!-- Advanced Search Bar -->
@@ -56,7 +56,7 @@
           <div class="flex flex-wrap items-center justify-center gap-2 mt-4 text-xs text-on-surface-variant">
             <span class="font-semibold text-primary">Kata kunci populer:</span>
             <button
-              v-for="kw in ['Metodologi Penelitian', 'Artificial Intelligence', 'Bumi Manusia', 'Hukum Perdata', 'Macroeconomics']"
+              v-for="kw in popularKeywordsList"
               :key="kw"
               @click="applyKeyword(kw)"
               class="px-2.5 py-1 bg-surface-container hover:bg-surface-container-high rounded-md text-on-surface transition-colors text-[11px]"
@@ -221,15 +221,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 defineEmits(['select-book'])
 const router = useRouter()
+const { settings } = useSiteSettings()
 
 const searchInput = ref('')
 const selectedScope = ref('all')
 const featuredBooks = ref<any[]>([])
+
+const popularKeywordsList = computed(() => {
+  if (!settings.value.heroPopularKeywords) return []
+  return settings.value.heroPopularKeywords.split(',').map((k) => k.trim()).filter(Boolean)
+})
 
 const applyKeyword = (kw: string) => {
   searchInput.value = kw

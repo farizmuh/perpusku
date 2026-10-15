@@ -1,0 +1,65 @@
+[
+  {
+    "id": 1,
+    "name": "Sains & Teknologi",
+    "slug": "sains-dan-teknologi",
+    "description": "Monograf, literatur komputasi, kecerdasan buatan, rekayasa teknik, dan ilmu alam terapan.",
+    "icon": "terminal",
+    "color": "#1e3a8a",
+    "location": "Lantai 2 - Sayap Barat"
+  },
+  {
+    "id": 2,
+    "name": "Ilmu Sosial & Politik",
+    "slug": "ilmu-sosial-dan-politik",
+    "description": "Koleksi sosiologi, ilmu pemerintahan, komunikasi, dan studi kebijakan publik kontemporer.",
+    "icon": "public",
+    "color": "#0284c7",
+    "location": "Lantai 1 - Ruang Baca A"
+  },
+  {
+    "id": 3,
+    "name": "Ekonomi & Manajemen Bisnis",
+    "slug": "ekonomi-dan-manajemen-bisnis",
+    "description": "Literatur makro-mikro ekonomi, akuntansi korporasi, investasi, dan strategi kewirausahaan.",
+    "icon": "trending_up",
+    "color": "#059669",
+    "location": "Lantai 2 - Sayap Timur"
+  },
+  {
+    "id": 4,
+    "name": "Sastra, Fiksi & Puisi",
+    "slug": "sastra-fiksi-dan-puisi",
+    "description": "Karya sastra kanonik Indonesia, novel fiksi filosofis, antologi puisi, dan prosa dunia.",
+    "icon": "auto_stories",
+    "color": "#d97706",
+    "location": "Lantai 3 - Rak Sastra"
+  },
+  {
+    "id": 5,
+    "name": "Ilmu Hukum & Konstitusi",
+    "slug": "ilmu-hukum-dan-konstitusi",
+    "description": "Kompilasi hukum perdata, hukum pidana, tata negara, hak asasi manusia, dan hukum internasional.",
+    "icon": "gavel",
+    "color": "#7c3aed",
+    "location": "Lantai 1 - Ruang Hukum"
+  },
+  {
+    "id": 6,
+    "name": "Humaniora & Filsafat",
+    "slug": "humaniora-dan-filsafat",
+    "description": "Eksplorasi etika, sejarah peradaban, epistemologi, arkeologi, dan studi kebudayaan.",
+    "icon": "history_edu",
+    "color": "#dc2626",
+    "location": "Lantai 3 - Sayap Utara"
+  },
+  {
+    "id": 7,
+    "name": "Kedokteran & Kesehatan",
+    "slug": "kedokteran-dan-kesehatan",
+    "description": "Buku teks biomedis, ilmu bedah, farmakologi klinis, dan epidemiologi kesehatan masyarakat.",
+    "icon": "medical_services",
+    "color": "#0d9488",
+    "location": "Lantai 1 - Koleksi Khusus"
+  }
+]

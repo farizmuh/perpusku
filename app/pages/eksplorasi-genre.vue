@@ -232,15 +232,17 @@ const isLoading = ref(true)
 const currentPage = ref(1)
 const pageSize = 8
 
-const categories = [
-  { name: 'Sains & Teknologi', slug: 'sains-dan-teknologi', icon: 'terminal', desc: 'Monograf komputasi, kecerdasan buatan, rekayasa software, elektro, dan fisika.', location: 'Lantai 2 - Sayap Barat' },
-  { name: 'Ilmu Sosial & Politik', slug: 'ilmu-sosial-dan-politik', icon: 'public', desc: 'Sosiologi, hubungan internasional, kebijakan publik, dan komunikasi massa.', location: 'Lantai 1 - Ruang Baca A' },
-  { name: 'Ekonomi & Bisnis', slug: 'ekonomi-dan-manajemen-bisnis', icon: 'trending_up', desc: 'Manajemen korporasi, akuntansi, pasar modal, dan teori ekonomi makro.', location: 'Lantai 2 - Sayap Timur' },
-  { name: 'Sastra & Fiksi', slug: 'sastra-fiksi-dan-puisi', icon: 'auto_stories', desc: 'Roman kanonik Indonesia, antologi puisi, prosa klasik dunia, dan naskah drama.', location: 'Lantai 3 - Rak Sastra' },
-  { name: 'Ilmu Hukum', slug: 'ilmu-hukum-dan-konstitusi', icon: 'gavel', desc: 'Kompilasi KUHPerdata, pidana, tata negara, dan hukum internasional.', location: 'Lantai 1 - Ruang Hukum' },
-  { name: 'Humaniora & Filsafat', slug: 'humaniora-dan-filsafat', icon: 'history_edu', desc: 'Sejarah peradaban, epistemologi, etika moral, dan kebudayaan nusantara.', location: 'Lantai 3 - Sayap Utara' },
-  { name: 'Kedokteran & Kesehatan', slug: 'kedokteran-dan-kesehatan', icon: 'medical_services', desc: 'Atlas anatomi, ilmu bedah, farmakologi, dan epidemiologi kesehatan.', location: 'Lantai 1 - Koleksi Khusus' }
+const defaultCategories = [
+  { id: 1, name: 'Sains & Teknologi', slug: 'sains-dan-teknologi', icon: 'terminal', desc: 'Monograf komputasi, kecerdasan buatan, rekayasa software, elektro, dan fisika.', location: 'Lantai 2 - Sayap Barat' },
+  { id: 2, name: 'Ilmu Sosial & Politik', slug: 'ilmu-sosial-dan-politik', icon: 'public', desc: 'Sosiologi, hubungan internasional, kebijakan publik, dan komunikasi massa.', location: 'Lantai 1 - Ruang Baca A' },
+  { id: 3, name: 'Ekonomi & Bisnis', slug: 'ekonomi-dan-manajemen-bisnis', icon: 'trending_up', desc: 'Manajemen korporasi, akuntansi, pasar modal, dan teori ekonomi makro.', location: 'Lantai 2 - Sayap Timur' },
+  { id: 4, name: 'Sastra & Fiksi', slug: 'sastra-fiksi-dan-puisi', icon: 'auto_stories', desc: 'Roman kanonik Indonesia, antologi puisi, prosa klasik dunia, dan naskah drama.', location: 'Lantai 3 - Rak Sastra' },
+  { id: 5, name: 'Ilmu Hukum', slug: 'ilmu-hukum-dan-konstitusi', icon: 'gavel', desc: 'Kompilasi KUHPerdata, pidana, tata negara, dan hukum internasional.', location: 'Lantai 1 - Ruang Hukum' },
+  { id: 6, name: 'Humaniora & Filsafat', slug: 'humaniora-dan-filsafat', icon: 'history_edu', desc: 'Sejarah peradaban, epistemologi, etika moral, dan kebudayaan nusantara.', location: 'Lantai 3 - Sayap Utara' },
+  { id: 7, name: 'Kedokteran & Kesehatan', slug: 'kedokteran-dan-kesehatan', icon: 'medical_services', desc: 'Atlas anatomi, ilmu bedah, farmakologi, dan epidemiologi kesehatan.', location: 'Lantai 1 - Koleksi Khusus' }
 ]
+
+const categories = ref<any[]>(defaultCategories)
 
 const currentCategory = computed(() => {
   if (selectedCategory.value === 'semua') {
@@ -251,7 +253,7 @@ const currentCategory = computed(() => {
       location: 'Semua Lokasi'
     }
   }
-  return categories.find((c) => c.slug === selectedCategory.value) || {
+  return categories.value.find((c: any) => c.slug === selectedCategory.value) || {
     name: 'Pilih Disiplin',
     icon: 'apps',
     desc: '',
@@ -260,7 +262,7 @@ const currentCategory = computed(() => {
 })
 
 const activeCategoryInfo = computed(() => {
-  return categories.find((c) => c.slug === selectedCategory.value)
+  return categories.value.find((c: any) => c.slug === selectedCategory.value)
 })
 
 const filteredBooks = computed(() => {
@@ -319,9 +321,16 @@ onMounted(async () => {
 
   isLoading.value = true
   try {
-    const res: any = await $fetch('/api/books')
-    if (res && res.data) {
-      books.value = res.data
+    const [booksRes, catsRes]: any = await Promise.all([
+      $fetch('/api/books'),
+      $fetch('/api/categories').catch(() => null)
+    ])
+
+    if (booksRes && booksRes.data) {
+      books.value = booksRes.data
+    }
+    if (catsRes && catsRes.data && catsRes.data.length > 0) {
+      categories.value = catsRes.data
     }
   } catch (err) {
     console.error(err)

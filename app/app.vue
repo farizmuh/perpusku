@@ -1,15 +1,15 @@
 <template>
   <div class="min-h-screen flex flex-col bg-background font-body text-on-surface antialiased">
-    <!-- Navbar with sticky header -->
-    <Navbar @open-search="isSearchOpen = true" />
+    <!-- Navbar with sticky header (hanya di rute publik) -->
+    <Navbar v-if="!isAdminRoute" @open-search="isSearchOpen = true" />
 
     <!-- Main Content Routed by Pages -->
-    <main class="flex-1 pt-28">
+    <main :class="isAdminRoute ? 'flex-1 pt-0' : 'flex-1 pt-28'">
       <NuxtPage @select-book="openBookModal" />
     </main>
 
-    <!-- Scholarly Footer -->
-    <Footer />
+    <!-- Scholarly Footer (hanya di rute publik) -->
+    <Footer v-if="!isAdminRoute" />
 
     <!-- Book Detail & Loan Reservation Modal -->
     <BookModal
@@ -109,7 +109,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+const isAdminRoute = computed(() => route.path.startsWith('/admin'))
 
 const isSearchOpen = ref(false)
 const searchQuery = ref('')
@@ -169,8 +173,11 @@ const onKeyDown = (e: KeyboardEvent) => {
   }
 }
 
+const { fetchSettings } = useSiteSettings()
+
 onMounted(() => {
   window.addEventListener('keydown', onKeyDown)
+  fetchSettings()
 })
 
 onUnmounted(() => {
