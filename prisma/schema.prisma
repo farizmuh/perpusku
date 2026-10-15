@@ -1,0 +1,70 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  slug        String   @unique
+  description String?  @db.Text
+  icon        String   @default("menu_book")
+  color       String   @default("#1e3a8a")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  books       Book[]
+}
+
+model Book {
+  id            Int           @id @default(autoincrement())
+  title         String
+  slug          String        @unique
+  author        String
+  isbn          String        @unique
+  publisher     String?
+  year          Int           @default(2024)
+  pages         Int           @default(300)
+  callNumber    String        // e.g. "005.133 JAV" or "899.221 PUS"
+  shelfLocation String        // e.g. "Lantai 2 - Rak B-04"
+  coverUrl      String        @db.Text
+  synopsis      String        @db.Text
+  stock         Int           @default(3)
+  available     Int           @default(3)
+  rating        Float         @default(4.8)
+  reviewsCount  Int           @default(12)
+  isFeatured    Boolean       @default(false)
+  isLiterature  Boolean       @default(false)
+  discipline    String        @default("Umum") // e.g. "Sains & Teknologi", "Humaniora", "Sastra"
+  categoryId    Int
+  category      Category      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  loanRequests  LoanRequest[]
+
+  @@index([categoryId])
+  @@index([discipline])
+  @@index([isFeatured])
+  @@index([isLiterature])
+}
+
+model LoanRequest {
+  id            Int      @id @default(autoincrement())
+  bookId        Int
+  book          Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  borrowerName  String
+  borrowerNim   String
+  borrowerEmail String?
+  borrowDate    DateTime @default(now())
+  dueDate       DateTime
+  status        String   @default("PENDING") // PENDING, APPROVED, REJECTED, RETURNED
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([bookId])
+  @@index([borrowerNim])
+}
