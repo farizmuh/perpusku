@@ -4,12 +4,12 @@
     <Navbar v-if="!isAdminRoute" @open-search="isSearchOpen = true" />
 
     <!-- Main Content Routed by Pages -->
-    <main :class="isAdminRoute ? 'flex-1 pt-0' : 'flex-1 pt-28'">
+    <main :class="isAdminRoute ? 'flex-1 pt-0' : 'flex-1 pt-16 sm:pt-28 pb-20 lg:pb-0'">
       <NuxtPage @select-book="openBookModal" />
     </main>
 
     <!-- Scholarly Footer (hanya di rute publik) -->
-    <Footer v-if="!isAdminRoute" />
+    <Footer v-if="!isAdminRoute" class="mb-16 lg:mb-0" />
 
     <!-- Book Detail & Loan Reservation Modal -->
     <BookModal
@@ -22,7 +22,7 @@
     <!-- Quick Search Command Modal (Cmd+K) -->
     <div
       v-if="isSearchOpen"
-      class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-start justify-center p-4 pt-20"
+      class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-start justify-center p-3 sm:p-4 pt-16 sm:pt-20"
       @click="isSearchOpen = false"
     >
       <div

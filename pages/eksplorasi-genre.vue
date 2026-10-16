@@ -1,22 +1,22 @@
 <template>
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+  <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10">
     <!-- Breadcrumb -->
-    <nav class="flex items-center gap-2 text-xs text-on-surface-variant mb-4">
+    <nav class="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs text-on-surface-variant mb-3 sm:mb-4">
       <NuxtLink to="/" class="hover:text-primary transition-colors">Beranda</NuxtLink>
       <span>/</span>
       <span class="text-on-surface font-semibold">Eksplorasi Disiplin & Genre</span>
     </nav>
 
     <!-- Page Header -->
-    <div class="mb-8">
-      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-fixed text-primary text-xs font-bold uppercase tracking-wider mb-2">
+    <div class="mb-6 sm:mb-8">
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-fixed text-primary text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-2">
         <span class="material-symbols-outlined text-sm">hub</span>
         <span>Struktur Klasifikasi Ilmu Pengetahuan</span>
       </div>
-      <h1 class="font-serif font-bold text-3xl sm:text-4xl text-primary mb-3">
-        Eksplorasi Genre & Disiplin Ilmu
+      <h1 class="font-serif font-bold text-2xl sm:text-4xl text-primary mb-2 sm:mb-3">
+        Eksplorasi Genre & Disiplin
       </h1>
-      <p class="text-sm text-on-surface-variant max-w-2xl leading-relaxed">
+      <p class="text-xs sm:text-sm text-on-surface-variant max-w-2xl leading-relaxed">
         Jelajahi karya ilmiah, buku teks kurikulum, dan monograf referensi yang dipetakan berdasarkan fakultas dan rumpun keilmuan.
       </p>
     </div>
@@ -129,30 +129,30 @@
     </div>
 
     <!-- Active Category Banner Info -->
-    <div v-if="activeCategoryInfo" class="bg-surface-container-low p-6 rounded-2xl border border-surface-container-high mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-      <div class="flex items-start gap-4">
-        <div class="w-12 h-12 rounded-xl bg-primary text-white flex items-center justify-center shrink-0">
-          <span class="material-symbols-outlined text-2xl">{{ activeCategoryInfo.icon }}</span>
+    <div v-if="activeCategoryInfo" class="bg-surface-container-low p-4 sm:p-6 rounded-2xl border border-surface-container-high mb-6 sm:mb-8 flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
+      <div class="flex items-start gap-3 sm:gap-4">
+        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-primary text-white flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-xl sm:text-2xl">{{ activeCategoryInfo.icon }}</span>
         </div>
         <div>
-          <h2 class="font-serif font-bold text-xl text-primary mb-1">{{ activeCategoryInfo.name }}</h2>
+          <h2 class="font-serif font-bold text-lg sm:text-xl text-primary mb-1">{{ activeCategoryInfo.name }}</h2>
           <p class="text-xs sm:text-sm text-on-surface-variant max-w-2xl">{{ activeCategoryInfo.desc }}</p>
         </div>
       </div>
-      <div class="text-xs bg-white px-4 py-2.5 rounded-xl border border-surface-container-high shrink-0">
-        <span class="text-outline block text-[10px] uppercase font-semibold">Lokasi Ruang Koleksi</span>
+      <div class="text-[11px] sm:text-xs bg-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl border border-surface-container-high shrink-0 self-start md:self-auto">
+        <span class="text-outline block text-[9px] sm:text-[10px] uppercase font-semibold">Lokasi Ruang Koleksi</span>
         <span class="font-semibold text-primary">{{ activeCategoryInfo.location }}</span>
       </div>
     </div>
 
-    <!-- Books Grid -->
+    <!-- Books Grid (2 Kolom di Mobile) -->
     <div v-if="isLoading" class="py-20 text-center text-xs text-outline flex items-center justify-center gap-2">
       <span class="material-symbols-outlined animate-spin text-xl">progress_activity</span>
       <span>Memuat data koleksi...</span>
     </div>
 
     <div v-else-if="filteredBooks.length > 0">
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-6">
         <BookCard
           v-for="b in paginatedBooks"
           :key="b.id"
@@ -253,7 +253,14 @@ const currentCategory = computed(() => {
       location: 'Semua Lokasi'
     }
   }
-  return categories.value.find((c: any) => c.slug === selectedCategory.value) || {
+  const found = categories.value.find((c: any) => c.slug === selectedCategory.value)
+  if (found) {
+    return {
+      ...found,
+      desc: found.description || found.desc || 'Koleksi literatur dan monograf akademik.'
+    }
+  }
+  return {
     name: 'Pilih Disiplin',
     icon: 'apps',
     desc: '',
@@ -262,12 +269,23 @@ const currentCategory = computed(() => {
 })
 
 const activeCategoryInfo = computed(() => {
-  return categories.value.find((c: any) => c.slug === selectedCategory.value)
+  const cat = categories.value.find((c: any) => c.slug === selectedCategory.value)
+  if (!cat) return null
+  return {
+    ...cat,
+    desc: cat.description || cat.desc || 'Koleksi monograf dan literatur keilmuan terkurasi.'
+  }
 })
 
 const filteredBooks = computed(() => {
   if (selectedCategory.value === 'semua') return books.value
-  return books.value.filter((b) => b.category?.slug === selectedCategory.value)
+  const targetCat = categories.value.find((c: any) => c.slug === selectedCategory.value)
+  return books.value.filter((b) => {
+    if (b.category?.slug === selectedCategory.value) return true
+    if (targetCat && (b.categoryId === targetCat.id || b.category?.id === targetCat.id)) return true
+    if (targetCat && b.discipline?.toLowerCase() === targetCat.name?.toLowerCase()) return true
+    return false
+  })
 })
 
 const totalPages = computed(() => {
@@ -291,7 +309,13 @@ watch(selectedCategory, () => {
 
 const getCategoryCount = (slug: string) => {
   if (slug === 'semua') return books.value.length
-  return books.value.filter((b) => b.category?.slug === slug).length
+  const targetCat = categories.value.find((c: any) => c.slug === slug)
+  return books.value.filter((b) => {
+    if (b.category?.slug === slug) return true
+    if (targetCat && (b.categoryId === targetCat.id || b.category?.id === targetCat.id)) return true
+    if (targetCat && b.discipline?.toLowerCase() === targetCat.name?.toLowerCase()) return true
+    return false
+  }).length
 }
 
 const selectCategory = (slug: string) => {

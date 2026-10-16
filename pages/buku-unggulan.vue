@@ -1,32 +1,32 @@
 <template>
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+  <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10">
     <!-- Breadcrumb -->
-    <nav class="flex items-center gap-2 text-xs text-on-surface-variant mb-4">
+    <nav class="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs text-on-surface-variant mb-3 sm:mb-4">
       <NuxtLink to="/" class="hover:text-primary transition-colors">Beranda</NuxtLink>
       <span>/</span>
       <span class="text-on-surface font-semibold">Buku Unggulan</span>
     </nav>
 
     <!-- Page Header -->
-    <div class="mb-8">
-      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-fixed text-secondary text-xs font-bold uppercase tracking-wider mb-2">
+    <div class="mb-6 sm:mb-8">
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-fixed text-secondary text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-2">
         <span class="material-symbols-outlined text-sm">stars</span>
         <span>Koleksi Pilihan & Rekomendasi</span>
       </div>
-      <h1 class="font-serif font-bold text-3xl sm:text-4xl text-primary mb-3">
-        Katalog Buku Unggulan Universitas
+      <h1 class="font-serif font-bold text-2xl sm:text-4xl text-primary mb-2 sm:mb-3">
+        Katalog Buku Unggulan
       </h1>
-      <p class="text-sm text-on-surface-variant max-w-2xl leading-relaxed">
+      <p class="text-xs sm:text-sm text-on-surface-variant max-w-2xl leading-relaxed">
         Daftar monograf dan literatur penting berakreditasi tinggi yang paling banyak dirujuk dan direkomendasikan oleh dosen serta peneliti fakultas.
       </p>
     </div>
 
     <!-- Filter & Search Controls Bar -->
-    <div class="bg-surface-container-lowest p-4 rounded-xl border border-surface-container-high shadow-subtle mb-8 space-y-4">
-      <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+    <div class="bg-surface-container-lowest p-3 sm:p-4 rounded-xl border border-surface-container-high shadow-subtle mb-6 sm:mb-8 space-y-3 sm:space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-2.5 sm:gap-3 items-center">
         <!-- Search Input -->
         <div class="md:col-span-5 relative flex items-center bg-surface-container-low rounded-lg px-3 py-1">
-          <span class="material-symbols-outlined text-outline text-lg mr-2">search</span>
+          <span class="material-symbols-outlined text-outline text-base sm:text-lg mr-2 shrink-0">search</span>
           <input
             v-model="searchQuery"
             type="text"
@@ -40,23 +40,17 @@
 
         <!-- Category Dropdown -->
         <div class="md:col-span-3 bg-surface-container-low rounded-lg px-3 py-1 flex items-center">
-          <span class="material-symbols-outlined text-outline text-lg mr-2">category</span>
-          <select v-model="selectedDiscipline" class="w-full bg-transparent text-xs font-semibold text-on-surface focus:outline-none cursor-pointer py-2">
+          <span class="material-symbols-outlined text-outline text-base sm:text-lg mr-2 shrink-0">category</span>
+          <select v-model="selectedDiscipline" class="w-full bg-transparent text-xs font-semibold text-on-surface focus:outline-none cursor-pointer py-1.5 sm:py-2">
             <option value="">Semua Disiplin</option>
-            <option value="Sains & Teknologi">Sains & Teknologi</option>
-            <option value="Ilmu Sosial">Ilmu Sosial & Politik</option>
-            <option value="Ekonomi & Bisnis">Ekonomi & Bisnis</option>
-            <option value="Sastra & Fiksi">Sastra & Fiksi</option>
-            <option value="Ilmu Hukum">Ilmu Hukum</option>
-            <option value="Humaniora">Humaniora & Filsafat</option>
-            <option value="Kedokteran">Kedokteran & Kesehatan</option>
+            <option v-for="cat in categoriesList" :key="cat.id" :value="cat.name">{{ cat.name }}</option>
           </select>
         </div>
 
         <!-- Sort Option -->
         <div class="md:col-span-2 bg-surface-container-low rounded-lg px-3 py-1 flex items-center">
-          <span class="material-symbols-outlined text-outline text-lg mr-2">sort</span>
-          <select v-model="selectedSort" class="w-full bg-transparent text-xs font-semibold text-on-surface focus:outline-none cursor-pointer py-2">
+          <span class="material-symbols-outlined text-outline text-base sm:text-lg mr-2 shrink-0">sort</span>
+          <select v-model="selectedSort" class="w-full bg-transparent text-xs font-semibold text-on-surface focus:outline-none cursor-pointer py-1.5 sm:py-2">
             <option value="popular">Paling Populer</option>
             <option value="rating">Rating Tertinggi</option>
             <option value="newest">Tahun Terbaru</option>
@@ -65,7 +59,7 @@
         </div>
 
         <!-- Only Available Checkbox -->
-        <div class="md:col-span-2 flex items-center justify-end">
+        <div class="md:col-span-2 flex items-center justify-between sm:justify-end">
           <label class="inline-flex items-center gap-2 cursor-pointer text-xs font-medium text-on-surface select-none">
             <input v-model="onlyAvailable" type="checkbox" class="rounded border-outline text-primary focus:ring-primary w-4 h-4 cursor-pointer" />
             <span>Hanya yang Tersedia</span>
@@ -74,7 +68,7 @@
       </div>
 
       <!-- Result Count & Active Filters -->
-      <div class="flex items-center justify-between text-xs text-on-surface-variant pt-2 border-t border-surface-container">
+      <div class="flex items-center justify-between text-[11px] sm:text-xs text-on-surface-variant pt-2 border-t border-surface-container">
         <span>Menampilkan <strong>{{ filteredBooks.length }}</strong> judul buku</span>
         <button
           v-if="searchQuery || selectedDiscipline || onlyAvailable"
@@ -82,19 +76,19 @@
           class="text-secondary hover:underline font-semibold flex items-center gap-1"
         >
           <span class="material-symbols-outlined text-xs">restart_alt</span>
-          <span>Reset Semua Filter</span>
+          <span>Reset Filter</span>
         </button>
       </div>
     </div>
 
-    <!-- Books Grid -->
+    <!-- Books Grid (2 Kolom di Mobile) -->
     <div v-if="isLoading" class="py-20 text-center text-xs text-outline flex items-center justify-center gap-2">
       <span class="material-symbols-outlined animate-spin text-xl">progress_activity</span>
       <span>Memuat katalog buku...</span>
     </div>
 
     <div v-else-if="filteredBooks.length > 0">
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-6">
         <BookCard
           v-for="b in paginatedBooks"
           :key="b.id"
@@ -174,6 +168,7 @@ defineEmits(['select-book'])
 const route = useRoute()
 
 const books = ref<any[]>([])
+const categoriesList = ref<any[]>([])
 const isLoading = ref(true)
 
 const searchQuery = ref('')
@@ -187,9 +182,15 @@ const pageSize = 8
 const loadBooks = async () => {
   isLoading.value = true
   try {
-    const res: any = await $fetch('/api/books')
-    if (res && res.data) {
-      books.value = res.data
+    const [booksRes, catsRes]: any = await Promise.all([
+      $fetch('/api/books'),
+      $fetch('/api/categories').catch(() => null)
+    ])
+    if (booksRes && booksRes.data) {
+      books.value = booksRes.data
+    }
+    if (catsRes && catsRes.data) {
+      categoriesList.value = catsRes.data
     }
   } catch (err) {
     console.error(err)
@@ -210,9 +211,14 @@ const filteredBooks = computed(() => {
       if (!match) return false
     }
 
-    // Discipline
-    if (selectedDiscipline.value && b.discipline !== selectedDiscipline.value) {
-      return false
+    // Discipline / Category
+    if (selectedDiscipline.value) {
+      const target = selectedDiscipline.value.toLowerCase().trim()
+      const match =
+        b.discipline?.toLowerCase().trim() === target ||
+        b.category?.name?.toLowerCase().trim() === target ||
+        b.category?.slug?.toLowerCase().trim() === target
+      if (!match) return false
     }
 
     // Only Available

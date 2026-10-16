@@ -1267,6 +1267,7 @@
               <label class="block font-bold text-slate-700 mb-1">Genre / Kategori *</label>
               <select
                 v-model="bookForm.categoryId"
+                @change="onBookCategoryChange"
                 required
                 class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold"
               >
@@ -2594,6 +2595,16 @@ const handleCoverDrop = (e: DragEvent) => {
   const file = e.dataTransfer?.files?.[0]
   if (file) {
     uploadImageFile(file)
+  }
+}
+
+const onBookCategoryChange = () => {
+  const selected = categoriesList.value.find(c => c.id === Number(bookForm.categoryId))
+  if (selected) {
+    bookForm.discipline = selected.name
+    if (!bookForm.shelfLocation || bookForm.shelfLocation === 'Lantai 1 - Rak Umum' || bookForm.shelfLocation === 'Lantai 1') {
+      bookForm.shelfLocation = selected.location || 'Lantai 1 - Rak Umum'
+    }
   }
 }
 

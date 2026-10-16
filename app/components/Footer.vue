@@ -1,7 +1,7 @@
 <template>
-  <footer class="bg-tertiary text-on-tertiary border-t border-tertiary-container pt-16 pb-12 mt-20">
+  <footer class="bg-tertiary text-on-tertiary border-t border-tertiary-container pt-10 sm:pt-16 pb-8 sm:pb-12 mt-12 sm:mt-20">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-tertiary-container/60">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 sm:gap-10 pb-8 sm:pb-12 border-b border-tertiary-container/60">
         <!-- Col 1: Identity & Accreditation -->
         <div class="lg:col-span-2 space-y-4">
           <div class="flex items-center gap-3">
@@ -14,7 +14,7 @@
               <p class="text-xs text-on-tertiary-container uppercase tracking-wider font-semibold">{{ settings.footerBuilding }}</p>
             </div>
           </div>
-          <p class="text-sm text-on-tertiary-container leading-relaxed max-w-sm">
+          <p class="text-xs sm:text-sm text-on-tertiary-container leading-relaxed max-w-sm">
             {{ settings.footerDescription }}
           </p>
           <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-tertiary-container text-secondary-fixed text-xs font-semibold">
@@ -45,7 +45,7 @@
           <ul class="space-y-2.5 text-xs text-on-tertiary-container">
             <li><a href="#" class="hover:text-white transition-colors">Presensi Kunjungan Fisik</a></li>
             <li><a href="#" class="hover:text-white transition-colors">Peminjaman & Pengembalian</a></li>
-            <li><a href="#" class="hover:text-white transition-colors">Reservasi Ruang Diskusi & Kubikel</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Reservasi Ruang Diskusi</a></li>
             <li><a href="#" class="hover:text-white transition-colors">Cek Plagiarisme Turnitin</a></li>
             <li><a href="#" class="hover:text-white transition-colors">Bebas Pustaka Kelulusan</a></li>
           </ul>
@@ -78,11 +78,11 @@
       </div>
 
       <!-- Bottom Bar -->
-      <div class="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-on-tertiary-container gap-4">
+      <div class="pt-6 sm:pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-on-tertiary-container gap-3 sm:gap-4 text-center sm:text-left">
         <div>
           {{ settings.footerCopyright }}
         </div>
-        <div class="flex items-center gap-6">
+        <div class="flex flex-wrap items-center justify-center sm:justify-end gap-4 sm:gap-6">
           <a href="#" class="hover:text-white transition-colors">Kebijakan Privasi</a>
           <a href="#" class="hover:text-white transition-colors">Syarat Penggunaan</a>
           <a href="#" class="hover:text-white transition-colors">Peta Situs</a>
