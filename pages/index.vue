@@ -238,7 +238,7 @@ const disciplines = ref<any[]>([])
 
 const popularKeywordsList = computed(() => {
   if (!settings.value.heroPopularKeywords) return []
-  return settings.value.heroPopularKeywords.split(',').map((k) => k.trim()).filter(Boolean)
+  return settings.value.heroPopularKeywords.split(',').map((k: string) => k.trim()).filter(Boolean)
 })
 
 const applyKeyword = (kw: string) => {

@@ -1,7 +1,7 @@
-import fs from 'node:fs'
-import path from 'node:path'
+import * as fs from 'node:fs'
+import * as path from 'node:path'
 import prisma from './prisma'
-import { initialBooks, SeedBook } from './seedData'
+import { initialBooks, type SeedBook } from './seedData'
 import { getAllCategories } from './categoriesRepository'
 
 export type BookData = SeedBook
@@ -153,7 +153,15 @@ export const createBook = async (data: Partial<BookData>): Promise<BookData> => 
   const categories = await getAllCategories()
   const newId = books.length > 0 ? Math.max(...books.map((b) => b.id)) + 1 : 1
 
-  const matchedCat = categories.find((c) => c.id === Number(data.categoryId)) || categories[0]
+  const fallbackCat = categories[0] || {
+    id: 1,
+    name: 'Umum',
+    slug: 'umum',
+    description: '',
+    icon: 'book',
+    color: 'from-blue-900 to-indigo-950'
+  }
+  const matchedCat = categories.find((c) => c.id === Number(data.categoryId)) || fallbackCat
 
   const safeNum = (val: any, fallback: number) => {
     if (val === undefined || val === null || val === '') return fallback
@@ -229,6 +237,8 @@ export const updateBook = async (id: number, data: Partial<BookData>): Promise<B
   if (index === -1) return null
 
   const existing = books[index]
+  if (!existing) return null
+
   const catId = data.categoryId ? Number(data.categoryId) : existing.categoryId
   const matchedCat = categories.find((c) => c.id === catId) || existing.category
 
@@ -236,6 +246,16 @@ export const updateBook = async (id: number, data: Partial<BookData>): Promise<B
     ...existing,
     ...data,
     id,
+    title: data.title !== undefined ? data.title : existing.title,
+    slug: data.slug !== undefined ? data.slug : existing.slug,
+    author: data.author !== undefined ? data.author : existing.author,
+    isbn: data.isbn !== undefined ? data.isbn : existing.isbn,
+    publisher: data.publisher !== undefined ? data.publisher : existing.publisher,
+    callNumber: data.callNumber !== undefined ? data.callNumber : existing.callNumber,
+    shelfLocation: data.shelfLocation !== undefined ? data.shelfLocation : existing.shelfLocation,
+    coverUrl: data.coverUrl !== undefined ? data.coverUrl : existing.coverUrl,
+    synopsis: data.synopsis !== undefined ? data.synopsis : existing.synopsis,
+    discipline: data.discipline !== undefined ? data.discipline : existing.discipline,
     categoryId: catId,
     category: matchedCat,
     stock: data.stock !== undefined ? Number(data.stock) : existing.stock,

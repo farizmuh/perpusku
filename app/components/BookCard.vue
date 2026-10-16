@@ -88,6 +88,8 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
+
 defineProps<{
   book: {
     id: number

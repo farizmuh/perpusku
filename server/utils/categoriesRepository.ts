@@ -1,5 +1,5 @@
-import fs from 'node:fs'
-import path from 'node:path'
+import * as fs from 'node:fs'
+import * as path from 'node:path'
 import prisma from './prisma'
 import { initialCategories } from './seedData'
 
@@ -120,14 +120,18 @@ export const updateCategory = async (id: number, data: Partial<CategoryData>): P
   const index = categories.findIndex((c) => c.id === id)
   if (index === -1) return null
 
-  const updated: CategoryData = {
-    ...categories[index],
-    ...data,
-    id // pertahankan id
-  }
+  const existing = categories[index]
+  if (!existing) return null
 
-  if (data.name && !data.slug) {
-    updated.slug = data.name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-')
+  const updated: CategoryData = {
+    ...existing,
+    ...data,
+    id,
+    name: data.name ?? existing.name,
+    slug: (data.name && !data.slug) ? data.name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-') : (data.slug ?? existing.slug),
+    description: data.description ?? existing.description,
+    icon: data.icon ?? existing.icon,
+    color: data.color ?? existing.color
   }
 
   categories[index] = updated

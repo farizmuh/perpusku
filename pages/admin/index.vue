@@ -2377,7 +2377,7 @@ const handleLogin = () => {
   loginError.value = ''
   if (passwordInput.value === 'admin123') {
     isAuthenticated.value = true
-    if (process.client) {
+    if (import.meta.client) {
       sessionStorage.setItem('perpusku_admin_auth', 'true')
     }
     populateSiteForm()
@@ -2390,7 +2390,7 @@ const handleLogin = () => {
 const handleLogout = () => {
   isAuthenticated.value = false
   passwordInput.value = ''
-  if (process.client) {
+  if (import.meta.client) {
     sessionStorage.removeItem('perpusku_admin_auth')
   }
 }
@@ -2915,7 +2915,7 @@ const setLoanDuration = (days: number) => {
   const baseDate = newLoanForm.borrowDate ? new Date(newLoanForm.borrowDate) : new Date()
   const due = new Date(baseDate)
   due.setDate(due.getDate() + Number(days))
-  newLoanForm.dueDate = due.toISOString().split('T')[0]
+  newLoanForm.dueDate = due.toISOString().slice(0, 10)
 }
 
 // Sinkronisasi status tombol durasi jika admin mengubah input tanggal secara manual
@@ -2939,7 +2939,7 @@ watch(
 
 const openAddLoanModal = () => {
   selectedDuration.value = 7
-  const today = new Date().toISOString().split('T')[0]
+  const today = new Date().toISOString().slice(0, 10)
   const defaultDue = new Date()
   defaultDue.setDate(defaultDue.getDate() + 7)
 
@@ -2948,7 +2948,7 @@ const openAddLoanModal = () => {
   newLoanForm.borrowerNim = ''
   newLoanForm.borrowerEmail = ''
   newLoanForm.borrowDate = today
-  newLoanForm.dueDate = defaultDue.toISOString().split('T')[0]
+  newLoanForm.dueDate = defaultDue.toISOString().slice(0, 10)
   newLoanForm.notes = ''
 
   isLoanModalOpen.value = true
@@ -3108,7 +3108,7 @@ const handleExportPdf = () => {
 }
 
 onMounted(async () => {
-  if (process.client) {
+  if (import.meta.client) {
     const cachedAuth = sessionStorage.getItem('perpusku_admin_auth')
     if (cachedAuth === 'true') {
       isAuthenticated.value = true
