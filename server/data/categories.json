@@ -61,5 +61,14 @@
     "icon": "medical_services",
     "color": "#0d9488",
     "location": "Lantai 1 - Koleksi Khusus"
+  },
+  {
+    "id": 8,
+    "name": "AGAMAKU AGAMAMU",
+    "slug": "agamaku-agamamu",
+    "description": "",
+    "icon": "mosque",
+    "color": "#cb3efe",
+    "location": "Lantai 1 - Ruang Umum"
   }
 ]

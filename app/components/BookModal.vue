@@ -67,7 +67,7 @@
           </div>
         </div>
 
-        <!-- Right Column: Content & Loan Form -->
+        <!-- Right Column: Content & Status Section -->
         <div class="md:col-span-7 p-6 md:p-8 flex flex-col justify-between">
           <div>
             <!-- Category & Rating -->
@@ -101,65 +101,35 @@
             </div>
           </div>
 
-          <!-- Loan Request Section -->
+          <!-- Availability & Physical Circulation Notice -->
           <div class="border-t border-surface-container-high pt-5 mt-4">
-            <h3 class="font-serif font-bold text-sm text-primary mb-3 flex items-center gap-1.5">
-              <span class="material-symbols-outlined text-lg text-secondary">assignment_add</span>
-              <span>Reservasi / Ajukan Peminjaman Buku</span>
-            </h3>
-
-            <div v-if="book.available > 0" class="space-y-3">
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label class="block text-[11px] font-semibold text-outline mb-1">Nama Mahasiswa / Pemustaka</label>
-                  <input
-                    v-model="borrowerName"
-                    type="text"
-                    placeholder="Contoh: Farhan Pratama"
-                    class="w-full px-3 py-2 rounded-lg bg-surface-container border border-surface-container-high focus:border-primary focus:bg-white text-xs outline-none transition-all"
-                  />
-                </div>
-                <div>
-                  <label class="block text-[11px] font-semibold text-outline mb-1">NIM / Nomor Anggota</label>
-                  <input
-                    v-model="borrowerNim"
-                    type="text"
-                    placeholder="Contoh: 2108561023"
-                    class="w-full px-3 py-2 rounded-lg bg-surface-container border border-surface-container-high focus:border-primary focus:bg-white text-xs outline-none transition-all"
-                  />
-                </div>
+            <div v-if="book.available > 0" class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-950 space-y-2">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-emerald-600 text-lg">check_circle</span>
+                <span class="text-xs font-bold">Status: Buku Tersedia di Perpustakaan ({{ book.available }} Eksemplar)</span>
               </div>
-
-              <div class="flex items-center gap-4">
-                <div class="flex-1">
-                  <label class="block text-[11px] font-semibold text-outline mb-1">Durasi Peminjaman</label>
-                  <select
-                    v-model="durationDays"
-                    class="w-full px-3 py-2 rounded-lg bg-surface-container border border-surface-container-high focus:border-primary focus:bg-white text-xs outline-none transition-all cursor-pointer"
-                  >
-                    <option value="3">3 Hari (Maksimal Ujian/Tugas)</option>
-                    <option value="7">7 Hari (Standar Mahasiswa)</option>
-                    <option value="14">14 Hari (Dosen / Tugas Akhir)</option>
-                  </select>
-                </div>
-              </div>
-
-              <button
-                @click="submitLoan"
-                :disabled="isSubmitting"
-                class="w-full py-2.5 px-4 rounded-lg bg-secondary text-on-secondary hover:bg-secondary-container font-semibold text-xs transition-all shadow-sm flex items-center justify-center gap-2 mt-2 disabled:opacity-50"
-              >
-                <span class="material-symbols-outlined text-sm">{{ isSubmitting ? 'hourglass_top' : 'send' }}</span>
-                <span>{{ isSubmitting ? 'Memproses Permohonan...' : 'Konfirmasi Ajukan Peminjaman' }}</span>
-              </button>
+              <p class="text-xs text-emerald-800 leading-relaxed">
+                Peminjaman fisik dilayani langsung oleh pustakawan di <strong>Meja Sirkulasi Perpustakaan</strong>. Silakan kunjungi lokasi rak <strong>{{ book.shelfLocation }}</strong> dengan nomor panggil <strong class="font-mono">{{ book.callNumber }}</strong> dan tunjukkan kartu identitas/KTM Anda ke petugas.
+              </p>
             </div>
 
-            <div v-else class="p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start gap-2">
-              <span class="material-symbols-outlined text-amber-600 text-base mt-0.5">info</span>
-              <div>
-                Semua eksemplar buku ini saat ini sedang dipinjam oleh pemustaka lain. Anda dapat memasukkannya ke daftar pantau atau menanyakan jadwal kembali ke pustakawan sirkulasi.
+            <div v-else class="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-950 space-y-2">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-rose-600 text-lg">cancel</span>
+                <span class="text-xs font-bold">Status: Sedang Dipinjam Semua (0 Tersedia)</span>
               </div>
+              <p class="text-xs text-rose-800 leading-relaxed">
+                Semua eksemplar buku ini saat ini sedang dipinjam oleh pemustaka lain. Anda dapat menanyakan jadwal pengembalian atau melakukan pengecekan berkala ke petugas sirkulasi.
+              </p>
             </div>
+
+            <button
+              @click="$emit('close')"
+              class="w-full mt-4 py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition-all flex items-center justify-center gap-1.5"
+            >
+              <span class="material-symbols-outlined text-base">arrow_back</span>
+              <span>Tutup Detail Buku</span>
+            </button>
           </div>
         </div>
       </div>
@@ -168,53 +138,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-
-const props = defineProps<{
+defineProps<{
   book: any
 }>()
 
-const emit = defineEmits(['close', 'loan-success'])
-
-const borrowerName = ref('')
-const borrowerNim = ref('')
-const durationDays = ref('7')
-const isSubmitting = ref(false)
-
-const submitLoan = async () => {
-  if (!borrowerName.value.trim() || !borrowerNim.value.trim()) {
-    alert('Harap masukkan Nama dan NIM Anda.')
-    return
-  }
-
-  isSubmitting.value = true
-
-  try {
-    const res = await $fetch('/api/loans/request', {
-      method: 'POST',
-      body: {
-        bookId: props.book.id,
-        borrowerName: borrowerName.value.trim(),
-        borrowerNim: borrowerNim.value.trim(),
-        durationDays: durationDays.value
-      }
-    })
-
-    if (res.success) {
-      // Decrease local available for instant reactive UI
-      props.book.available = Math.max(0, props.book.available - 1)
-      emit('loan-success', res.message)
-      emit('close')
-    } else {
-      alert(res.message || 'Gagal mengajukan peminjaman.')
-    }
-  } catch (err: any) {
-    // Graceful offline simulation if server route or MySQL not ready
-    props.book.available = Math.max(0, props.book.available - 1)
-    emit('loan-success', `Peminjaman buku "${props.book.title}" untuk NIM ${borrowerNim.value} berhasil diajukan! (Simulasi Sirkulasi)`)
-    emit('close')
-  } finally {
-    isSubmitting.value = false
-  }
-}
+defineEmits(['close'])
 </script>

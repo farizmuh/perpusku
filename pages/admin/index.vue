@@ -159,6 +159,16 @@
               <span class="material-symbols-outlined text-lg">category</span>
               <span>3. Kelola Rumpun & Genre ({{ categoriesList.length }})</span>
             </button>
+
+            <button
+              type="button"
+              @click="mainSection = 'loans'"
+              class="flex-1 min-w-[200px] py-3 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2"
+              :class="mainSection === 'loans' ? 'bg-primary text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'"
+            >
+              <span class="material-symbols-outlined text-lg">local_library</span>
+              <span>4. Sirkulasi Peminjaman ({{ activeLoansCount }})</span>
+            </button>
           </div>
 
           <!-- SECTION 1: PENGATURAN WEBSITE (NAVBAR, HERO, FOOTER) -->
@@ -806,6 +816,335 @@
               </div>
             </div>
           </div>
+
+          <!-- SECTION 4: SIRKULASI & PEMINJAMAN BUKU -->
+          <div v-show="mainSection === 'loans'" class="space-y-6">
+            <!-- Header & Summary Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <!-- Card 1: Aktif Dipinjam -->
+              <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between">
+                <div>
+                  <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Sedang Dipinjam</p>
+                  <h3 class="text-2xl font-bold font-serif text-primary mt-0.5">{{ activeLoansCount }}</h3>
+                  <p class="text-[11px] text-slate-400 mt-0.5">Eksemplar di tangan pemustaka</p>
+                </div>
+                <div class="w-12 h-12 rounded-2xl bg-blue-50 text-primary flex items-center justify-center">
+                  <span class="material-symbols-outlined text-2xl">book</span>
+                </div>
+              </div>
+
+              <!-- Card 2: Terlambat / Overdue -->
+              <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between">
+                <div>
+                  <p class="text-[11px] font-bold text-rose-600 uppercase tracking-wider">Terlambat (Overdue)</p>
+                  <h3 class="text-2xl font-bold font-serif text-rose-600 mt-0.5">{{ overdueLoansCount }}</h3>
+                  <p class="text-[11px] text-slate-400 mt-0.5">Melewati batas tenggat waktu</p>
+                </div>
+                <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-2xl">warning</span>
+                </div>
+              </div>
+
+              <!-- Card 3: Sudah Dikembalikan -->
+              <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between">
+                <div>
+                  <p class="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">Riwayat Selesai</p>
+                  <h3 class="text-2xl font-bold font-serif text-emerald-700 mt-0.5">{{ returnedLoansCount }}</h3>
+                  <p class="text-[11px] text-slate-400 mt-0.5">Buku telah dikembalikan</p>
+                </div>
+                <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-2xl">check_circle</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Toolbar: Search, Filter Tabs, & Button Tambah -->
+            <div class="bg-white p-4 sm:p-5 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <!-- Filter Tabs & Search -->
+              <div class="flex-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <!-- Search Input -->
+                <div class="relative flex-1">
+                  <span class="material-symbols-outlined text-slate-400 absolute left-3 top-2.5 text-base">search</span>
+                  <input
+                    v-model="loanSearchQuery"
+                    type="text"
+                    placeholder="Cari nama peminjam, NIM, judul buku, atau ISBN..."
+                    class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  />
+                </div>
+
+                <!-- Status Tabs -->
+                <div class="inline-flex p-1 bg-slate-100 rounded-xl border border-slate-200 overflow-x-auto shrink-0">
+                  <button
+                    type="button"
+                    @click="loanFilterStatus = 'BORROWED'"
+                    class="px-3 py-1.5 text-xs rounded-lg transition-all font-semibold whitespace-nowrap"
+                    :class="loanFilterStatus === 'BORROWED' ? 'bg-white text-primary shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900'"
+                  >
+                    Sedang Dipinjam ({{ activeLoansCount }})
+                  </button>
+                  <button
+                    type="button"
+                    @click="loanFilterStatus = 'OVERDUE'"
+                    class="px-3 py-1.5 text-xs rounded-lg transition-all font-semibold whitespace-nowrap flex items-center gap-1"
+                    :class="loanFilterStatus === 'OVERDUE' ? 'bg-white text-rose-600 shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900'"
+                  >
+                    <span>Terlambat</span>
+                    <span v-if="overdueLoansCount > 0" class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+                  </button>
+                  <button
+                    type="button"
+                    @click="loanFilterStatus = 'RETURNED'"
+                    class="px-3 py-1.5 text-xs rounded-lg transition-all font-semibold whitespace-nowrap"
+                    :class="loanFilterStatus === 'RETURNED' ? 'bg-white text-emerald-700 shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900'"
+                  >
+                    Riwayat Kembali
+                  </button>
+                  <button
+                    type="button"
+                    @click="loanFilterStatus = 'ALL'"
+                    class="px-3 py-1.5 text-xs rounded-lg transition-all font-semibold whitespace-nowrap"
+                    :class="loanFilterStatus === 'ALL' ? 'bg-white text-slate-900 shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900'"
+                  >
+                    Semua ({{ loansList.length }})
+                  </button>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <!-- Button Ekspor Laporan -->
+                <button
+                  type="button"
+                  @click="openExportModal"
+                  class="px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
+                  title="Generate & download laporan peminjaman dalam format Excel atau PDF"
+                >
+                  <span class="material-symbols-outlined text-base">download</span>
+                  <span>Ekspor Laporan</span>
+                </button>
+
+                <!-- Button Catat Peminjaman Baru -->
+                <button
+                  type="button"
+                  @click="openAddLoanModal"
+                  class="px-5 py-2.5 rounded-xl bg-primary text-white hover:bg-primary-container text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+                >
+                  <span class="material-symbols-outlined text-base">add_circle</span>
+                  <span>+ Catat Peminjaman Baru</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Tabel Daftar Peminjaman -->
+            <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                  <thead class="bg-slate-100/80 text-slate-700 font-bold uppercase tracking-wider border-b border-slate-200">
+                    <tr>
+                      <th class="py-3 px-4">Pemustaka / Mahasiswa</th>
+                      <th class="py-3 px-4">Buku Yang Dipinjam</th>
+                      <th class="py-3 px-4">Tgl Pinjam</th>
+                      <th class="py-3 px-4">Batas Tenggat</th>
+                      <th class="py-3 px-4 text-center">Status</th>
+                      <th class="py-3 px-4 text-center">Aksi Sirkulasi</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100">
+                    <tr v-if="filteredLoans.length === 0">
+                      <td colspan="6" class="py-12 text-center text-slate-400">
+                        <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-2">
+                          <span class="material-symbols-outlined text-2xl">search_off</span>
+                        </div>
+                        <p class="font-semibold text-xs text-slate-500">Tidak ada data peminjaman yang sesuai dengan filter.</p>
+                      </td>
+                    </tr>
+                    <tr
+                      v-for="loan in paginatedLoans"
+                      :key="loan.id"
+                      class="hover:bg-slate-50/80 transition-colors"
+                      :class="isOverdue(loan) ? 'bg-rose-50/30' : ''"
+                    >
+                      <!-- Kolom Pemustaka -->
+                      <td class="py-3.5 px-4">
+                        <div class="font-bold text-slate-900 text-xs sm:text-sm">{{ loan.borrowerName }}</div>
+                        <div class="text-[11px] font-mono text-slate-500 flex items-center gap-1 mt-0.5">
+                          <span class="material-symbols-outlined text-[13px]">badge</span>
+                          <span>NIM: {{ loan.borrowerNim }}</span>
+                        </div>
+                        <div v-if="loan.borrowerEmail" class="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5">
+                          <span class="material-symbols-outlined text-[12px]">contact_mail</span>
+                          <span>{{ loan.borrowerEmail }}</span>
+                        </div>
+                        <div v-if="loan.notes" class="text-[11px] text-slate-500 italic mt-1 bg-slate-100 px-2 py-0.5 rounded-md inline-block max-w-xs truncate">
+                          "{{ loan.notes }}"
+                        </div>
+                      </td>
+
+                      <!-- Kolom Buku -->
+                      <td class="py-3.5 px-4">
+                        <div class="flex items-center gap-3">
+                          <img
+                            :src="loan.book?.coverUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c'"
+                            :alt="loan.book?.title"
+                            class="w-10 h-14 object-cover rounded-lg shadow-xs border border-slate-200 shrink-0"
+                          />
+                          <div>
+                            <div class="font-bold text-slate-900 line-clamp-1 max-w-[220px]" :title="loan.book?.title">
+                              {{ loan.book?.title || 'Buku Tidak Diketahui' }}
+                            </div>
+                            <div class="text-[11px] text-slate-500">{{ loan.book?.author }}</div>
+                            <div class="text-[10px] text-slate-400 font-mono mt-0.5">
+                              No. Panggil: {{ loan.book?.callNumber || '-' }}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+
+                      <!-- Kolom Tgl Pinjam -->
+                      <td class="py-3.5 px-4 font-mono text-[11px] text-slate-600 whitespace-nowrap">
+                        {{ formatIndoDate(loan.borrowDate) }}
+                      </td>
+
+                      <!-- Kolom Batas Tenggat & Overdue Badge -->
+                      <td class="py-3.5 px-4 whitespace-nowrap">
+                        <div class="font-mono text-[11px] font-semibold text-slate-800">
+                          {{ formatIndoDate(loan.dueDate) }}
+                        </div>
+
+                        <!-- Status badge jika belum dikembalikan -->
+                        <div v-if="loan.status !== 'RETURNED'" class="mt-1">
+                          <span
+                            v-if="isOverdue(loan)"
+                            class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-700 flex items-center gap-1 w-fit animate-pulse"
+                          >
+                            <span class="material-symbols-outlined text-xs">error</span>
+                            <span>Terlambat {{ getOverdueDays(loan) }} Hari</span>
+                          </span>
+                          <span
+                            v-else
+                            class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 flex items-center gap-1 w-fit"
+                          >
+                            <span class="material-symbols-outlined text-xs">schedule</span>
+                            <span>Sisa {{ getRemainingDays(loan) }} Hari</span>
+                          </span>
+                        </div>
+                        <div v-else class="mt-1">
+                          <span class="text-[10px] text-slate-400 italic">Sudah kembali</span>
+                        </div>
+                      </td>
+
+                      <!-- Kolom Status -->
+                      <td class="py-3.5 px-4 text-center whitespace-nowrap">
+                        <span
+                          v-if="loan.status === 'RETURNED'"
+                          class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200"
+                        >
+                          DIKEMBALIKAN
+                        </span>
+                        <span
+                          v-else-if="isOverdue(loan)"
+                          class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-300"
+                        >
+                          TERLAMBAT
+                        </span>
+                        <span
+                          v-else
+                          class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200"
+                        >
+                          DIPINJAM
+                        </span>
+                      </td>
+
+                      <!-- Kolom Aksi -->
+                      <td class="py-3.5 px-4 text-center whitespace-nowrap">
+                        <div class="flex items-center justify-center gap-1.5">
+                          <!-- Tombol Kembalikan (Hanya tampil jika belum returned) -->
+                          <button
+                            v-if="loan.status !== 'RETURNED'"
+                            type="button"
+                            @click="handleReturnLoan(loan)"
+                            class="px-2.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold transition-all shadow-xs flex items-center gap-1"
+                            title="Tandai buku ini sudah dikembalikan (mengembalikan stok buku)"
+                          >
+                            <span class="material-symbols-outlined text-sm">assignment_turned_in</span>
+                            <span>Kembalikan</span>
+                          </button>
+
+                          <!-- Tombol Perpanjang +7 Hari -->
+                          <button
+                            v-if="loan.status !== 'RETURNED'"
+                            type="button"
+                            @click="handleExtendLoan(loan)"
+                            class="p-1.5 rounded-xl bg-slate-100 hover:bg-amber-100 text-slate-700 hover:text-amber-800 transition-all border border-slate-200"
+                            title="Perpanjang batas waktu kembali (+7 hari)"
+                          >
+                            <span class="material-symbols-outlined text-sm">update</span>
+                          </button>
+
+                          <!-- Tombol Hapus / Batalkan -->
+                          <button
+                            type="button"
+                            @click="handleDeleteLoan(loan)"
+                            class="p-1.5 rounded-xl bg-slate-100 hover:bg-rose-100 text-slate-600 hover:text-rose-700 transition-all border border-slate-200"
+                            title="Hapus / Batalkan catatan transaksi ini"
+                          >
+                            <span class="material-symbols-outlined text-sm">delete</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Pagination Controls Bar Sirkulasi Peminjaman -->
+              <div class="p-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                <div class="text-slate-600">
+                  Menampilkan <span class="font-bold text-slate-800">{{ filteredLoans.length > 0 ? (loanCurrentPage - 1) * loanPageSize + 1 : 0 }}</span> – <span class="font-bold text-slate-800">{{ Math.min(loanCurrentPage * loanPageSize, filteredLoans.length) }}</span> dari <span class="font-bold text-slate-800">{{ filteredLoans.length }}</span> catatan peminjaman
+                </div>
+
+                <div v-if="loanTotalPages > 1" class="flex items-center gap-1.5">
+                  <!-- Previous Button -->
+                  <button
+                    type="button"
+                    @click="goToLoanPage(loanCurrentPage - 1)"
+                    :disabled="loanCurrentPage === 1"
+                    class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-semibold flex items-center gap-1 transition-all"
+                    :class="loanCurrentPage === 1 ? 'opacity-40 cursor-not-allowed bg-slate-100 text-slate-400' : 'bg-white hover:bg-slate-100 text-slate-700 shadow-sm cursor-pointer'"
+                  >
+                    <span class="material-symbols-outlined text-sm">chevron_left</span>
+                    <span>Sebelumnya</span>
+                  </button>
+
+                  <!-- Page Numbers -->
+                  <div class="flex items-center gap-1">
+                    <button
+                      v-for="p in loanTotalPages"
+                      :key="p"
+                      type="button"
+                      @click="goToLoanPage(p)"
+                      class="w-7 h-7 rounded-lg text-xs font-bold transition-all flex items-center justify-center cursor-pointer"
+                      :class="loanCurrentPage === p ? 'bg-primary text-white shadow-sm' : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-300'"
+                    >
+                      {{ p }}
+                    </button>
+                  </div>
+
+                  <!-- Next Button -->
+                  <button
+                    type="button"
+                    @click="goToLoanPage(loanCurrentPage + 1)"
+                    :disabled="loanCurrentPage === loanTotalPages"
+                    class="px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all"
+                    :class="loanCurrentPage === loanTotalPages ? 'opacity-40 cursor-not-allowed border border-slate-300 bg-slate-100 text-slate-400' : 'bg-primary text-white hover:bg-primary-container shadow-sm cursor-pointer'"
+                  >
+                    <span>Berikutnya</span>
+                    <span class="material-symbols-outlined text-sm">chevron_right</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </main>
@@ -833,28 +1172,48 @@
         </div>
 
         <!-- Modal Body Form -->
-        <form @submit.prevent="saveBookForm" class="p-6 sm:p-8 space-y-5 max-h-[75vh] overflow-y-auto text-xs">
+        <form ref="bookModalFormRef" @submit.prevent="saveBookForm" novalidate class="p-6 sm:p-8 space-y-5 max-h-[75vh] overflow-y-auto text-xs">
+          <!-- Pesan Error Validasi / Simpan (Jika Ada) -->
+          <div
+            v-if="bookModalError"
+            class="p-4 bg-rose-50 border border-rose-200 rounded-2xl text-rose-700 flex items-start gap-3 shadow-xs animate-shake"
+          >
+            <span class="material-symbols-outlined text-rose-600 text-xl shrink-0 mt-0.5">error</span>
+            <div class="flex-1">
+              <h4 class="font-bold text-xs">Perhatian: Form Belum Lengkap</h4>
+              <p class="text-xs text-rose-600 mt-0.5">{{ bookModalError }}</p>
+            </div>
+          </div>
+
           <!-- Judul & Pengarang -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label class="block font-bold text-slate-700 mb-1">Judul Buku *</label>
+              <label class="block font-bold text-slate-700 mb-1 flex items-center justify-between">
+                <span>Judul Buku <span class="text-rose-500">*</span></span>
+                <span v-if="!bookForm.title.trim()" class="text-[10px] text-rose-500 font-normal">Wajib diisi</span>
+              </label>
               <input
+                ref="bookTitleInputRef"
                 v-model="bookForm.title"
-                required
                 type="text"
                 placeholder="Judul lengkap buku..."
-                class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary/20 text-xs sm:text-sm"
+                :class="bookModalError && !bookForm.title.trim() ? 'border-rose-400 ring-2 ring-rose-200 bg-rose-50/30' : 'border-slate-300 bg-slate-50'"
+                class="w-full px-3.5 py-2.5 border rounded-xl focus:ring-2 focus:ring-primary/20 text-xs sm:text-sm transition-all"
               />
             </div>
 
             <div>
-              <label class="block font-bold text-slate-700 mb-1">Pengarang / Penulis *</label>
+              <label class="block font-bold text-slate-700 mb-1 flex items-center justify-between">
+                <span>Pengarang / Penulis <span class="text-rose-500">*</span></span>
+                <span v-if="!bookForm.author.trim()" class="text-[10px] text-rose-500 font-normal">Wajib diisi</span>
+              </label>
               <input
+                ref="bookAuthorInputRef"
                 v-model="bookForm.author"
-                required
                 type="text"
                 placeholder="Nama penulis..."
-                class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary/20 text-xs sm:text-sm"
+                :class="bookModalError && !bookForm.author.trim() ? 'border-rose-400 ring-2 ring-rose-200 bg-rose-50/30' : 'border-slate-300 bg-slate-50'"
+                class="w-full px-3.5 py-2.5 border rounded-xl focus:ring-2 focus:ring-primary/20 text-xs sm:text-sm transition-all"
               />
             </div>
           </div>
@@ -1136,22 +1495,32 @@
           </div>
 
           <!-- Modal Action Buttons -->
-          <div class="pt-4 border-t border-slate-200 flex justify-end gap-3">
-            <button
-              type="button"
-              @click="isBookModalOpen = false"
-              class="px-4 py-2 rounded-xl border border-slate-300 hover:bg-slate-100 font-semibold text-slate-700"
+          <div class="space-y-3 pt-4 border-t border-slate-200">
+            <div
+              v-if="bookModalError"
+              class="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 flex items-center gap-2 text-xs"
             >
-              Batal
-            </button>
-            <button
-              type="submit"
-              :disabled="isSubmittingBook"
-              class="px-6 py-2 rounded-xl bg-primary text-white hover:bg-primary-container font-bold shadow-sm flex items-center gap-1.5"
-            >
-              <span v-if="isSubmittingBook" class="material-symbols-outlined text-sm animate-spin">progress_activity</span>
-              <span>{{ isSubmittingBook ? 'Menyimpan...' : 'Simpan Data Buku' }}</span>
-            </button>
+              <span class="material-symbols-outlined text-rose-600 text-base shrink-0">warning</span>
+              <span class="font-medium">{{ bookModalError }}</span>
+            </div>
+
+            <div class="flex justify-end gap-3">
+              <button
+                type="button"
+                @click="isBookModalOpen = false"
+                class="px-4 py-2 rounded-xl border border-slate-300 hover:bg-slate-100 font-semibold text-slate-700 cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                type="submit"
+                :disabled="isSubmittingBook"
+                class="px-6 py-2 rounded-xl bg-primary text-white hover:bg-primary-container font-bold shadow-sm flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              >
+                <span v-if="isSubmittingBook" class="material-symbols-outlined text-sm animate-spin">progress_activity</span>
+                <span>{{ isSubmittingBook ? 'Menyimpan...' : 'Simpan Data Buku' }}</span>
+              </button>
+            </div>
           </div>
         </form>
       </div>
@@ -1200,17 +1569,123 @@
             </div>
 
             <div>
-              <label class="block font-bold text-slate-700 mb-1">Ikon (Material Symbols)</label>
-              <div class="flex items-center gap-2">
-                <input
-                  v-model="categoryForm.icon"
-                  type="text"
-                  placeholder="terminal, public, gavel..."
-                  class="flex-1 px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs"
-                />
-                <span class="material-symbols-outlined text-lg text-primary">{{ categoryForm.icon || 'menu_book' }}</span>
-              </div>
+              <label class="block font-bold text-slate-700 mb-1">Ikon Genre</label>
+              <button
+                type="button"
+                @click="isIconPickerOpen = !isIconPickerOpen"
+                class="w-full flex items-center justify-between px-3 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-300 rounded-xl text-xs transition-colors h-[38px] group"
+              >
+                <div class="flex items-center gap-2 truncate">
+                  <div
+                    class="w-6 h-6 rounded-lg flex items-center justify-center text-white shrink-0 shadow-xs"
+                    :style="{ backgroundColor: categoryForm.color || '#00236f' }"
+                  >
+                    <span class="material-symbols-outlined text-base">{{ categoryForm.icon || 'menu_book' }}</span>
+                  </div>
+                  <span class="font-bold text-slate-800 text-xs truncate">{{ getSelectedIconLabel }}</span>
+                </div>
+                <div class="flex items-center gap-1 text-slate-400 group-hover:text-primary shrink-0">
+                  <span class="text-[10px] font-semibold hidden sm:inline">{{ isIconPickerOpen ? 'Tutup' : 'Pilih' }}</span>
+                  <span class="material-symbols-outlined text-base">
+                    {{ isIconPickerOpen ? 'expand_less' : 'grid_view' }}
+                  </span>
+                </div>
+              </button>
             </div>
+          </div>
+
+          <!-- Panel Pemilihan Ikon Interaktif (Tinggal Memilih) -->
+          <div v-if="isIconPickerOpen" class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-2.5 transition-all">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-slate-800 text-xs flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-base text-primary">category</span>
+                Koleksi Ikon Genre (Tinggal Klik):
+              </span>
+              <button
+                type="button"
+                @click="isIconPickerOpen = false"
+                class="text-slate-400 hover:text-slate-600 text-[11px] font-bold flex items-center gap-0.5"
+              >
+                <span>Selesai</span>
+                <span class="material-symbols-outlined text-sm">check</span>
+              </button>
+            </div>
+
+            <!-- Search & Kategori Filter -->
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+              <input
+                v-model="iconSearchQuery"
+                type="text"
+                placeholder="Cari ikon... (contoh: buku, hukum, medis, sains, komputer)"
+                class="w-full pl-8 pr-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+              />
+            </div>
+
+            <!-- Filter Kategori Tabs -->
+            <div class="flex items-center gap-1 overflow-x-auto pb-1 text-[11px] scrollbar-none">
+              <button
+                v-for="cat in iconCategories"
+                :key="cat"
+                type="button"
+                @click="selectedIconCategory = cat"
+                class="px-2.5 py-0.5 rounded-full whitespace-nowrap transition-colors"
+                :class="selectedIconCategory === cat ? 'bg-primary text-white font-bold shadow-xs' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'"
+              >
+                {{ cat }}
+              </button>
+            </div>
+
+            <!-- Grid Ikon -->
+            <div class="grid grid-cols-7 sm:grid-cols-8 gap-1.5 max-h-48 overflow-y-auto p-1.5 bg-white rounded-xl border border-slate-200">
+              <button
+                v-for="item in filteredGenreIcons"
+                :key="item.name"
+                type="button"
+                @click="categoryForm.icon = item.name"
+                :title="item.label"
+                class="aspect-square rounded-xl flex flex-col items-center justify-center p-1 transition-all group relative border cursor-pointer"
+                :class="categoryForm.icon === item.name ? 'bg-primary text-white border-primary ring-2 ring-primary/30 shadow-sm scale-105' : 'bg-slate-50 border-transparent text-slate-600 hover:bg-primary/10 hover:text-primary hover:border-primary/20'"
+              >
+                <span class="material-symbols-outlined text-xl">{{ item.name }}</span>
+              </button>
+            </div>
+
+            <div class="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-200/60">
+              <span class="truncate">
+                Terpilih: <strong class="text-primary font-bold">{{ getSelectedIconLabel }}</strong>
+              </span>
+              <button
+                type="button"
+                @click="isIconPickerOpen = false"
+                class="px-3 py-1 bg-primary hover:bg-primary-dark text-white font-bold rounded-lg transition-colors text-xs shrink-0"
+              >
+                Gunakan Ikon
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick Select Ikon Populer jika picker sedang tertutup -->
+          <div v-else class="flex items-center gap-1.5 overflow-x-auto py-1 -mt-1 text-[11px]">
+            <span class="text-[10px] text-slate-400 font-semibold whitespace-nowrap">Ikon Cepat:</span>
+            <button
+              v-for="quick in quickGenreIcons"
+              :key="quick.name"
+              type="button"
+              @click="categoryForm.icon = quick.name"
+              :title="quick.label"
+              class="w-7 h-7 rounded-lg border transition-all flex items-center justify-center shrink-0"
+              :class="categoryForm.icon === quick.name ? 'bg-primary text-white border-primary shadow-xs scale-105' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-white hover:text-primary hover:border-primary/40'"
+            >
+              <span class="material-symbols-outlined text-base">{{ quick.name }}</span>
+            </button>
+            <button
+              type="button"
+              @click="isIconPickerOpen = true"
+              class="px-2 py-1 text-[10px] font-bold text-primary hover:underline whitespace-nowrap"
+            >
+              + Lainnya
+            </button>
           </div>
 
           <div class="grid grid-cols-2 gap-4">
@@ -1271,11 +1746,322 @@
         </form>
       </div>
     </div>
+
+    <!-- MODAL 3: CATAT PEMINJAMAN BUKU BARU -->
+    <div
+      v-if="isLoanModalOpen"
+      class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto"
+      @click.self="isLoanModalOpen = false"
+    >
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden my-8">
+        <!-- Header -->
+        <div class="bg-primary text-white p-5 px-6 flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <span class="material-symbols-outlined text-2xl text-secondary-container">add_task</span>
+            <h3 class="font-serif font-bold text-lg">Catat Peminjaman Buku Manual</h3>
+          </div>
+          <button @click="isLoanModalOpen = false" class="text-white/80 hover:text-white">
+            <span class="material-symbols-outlined text-xl">close</span>
+          </button>
+        </div>
+
+        <!-- Form Body -->
+        <form @submit.prevent="saveLoanForm" class="p-6 sm:p-8 space-y-5 max-h-[75vh] overflow-y-auto text-xs">
+          <!-- Pilih Buku -->
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Pilih Buku Katalog *</label>
+            <select
+              v-model="newLoanForm.bookId"
+              required
+              class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary/20 text-xs sm:text-sm font-semibold"
+            >
+              <option value="" disabled>-- Pilih buku yang tersedia --</option>
+              <option
+                v-for="b in availableBooksForLoan"
+                :key="b.id"
+                :value="b.id"
+              >
+                {{ b.title }} (Tersedia: {{ b.available }}/{{ b.stock }}) - {{ b.callNumber }}
+              </option>
+            </select>
+            <p v-if="availableBooksForLoan.length === 0" class="text-[11px] text-rose-500 mt-1 font-semibold">
+              Tidak ada buku yang memiliki stok tersedia untuk dipinjam saat ini.
+            </p>
+          </div>
+
+          <!-- Nama Pemustaka & NIM -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Nama Lengkap Pemustaka *</label>
+              <input
+                v-model="newLoanForm.borrowerName"
+                required
+                type="text"
+                placeholder="Contoh: Ahmad Dahlan"
+                class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary/20 text-xs sm:text-sm"
+              />
+            </div>
+
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">NIM / Nomor Anggota *</label>
+              <input
+                v-model="newLoanForm.borrowerNim"
+                required
+                type="text"
+                placeholder="Contoh: 2108561055"
+                class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary/20 text-xs sm:text-sm font-mono"
+              />
+            </div>
+          </div>
+
+          <!-- Email / No Telp (Opsional) -->
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Email / Kontak Mahasiswa (Opsional)</label>
+            <input
+              v-model="newLoanForm.borrowerEmail"
+              type="text"
+              placeholder="Contoh: mahasiswa@kampus.ac.id / 08123456789"
+              class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary/20 text-xs"
+            />
+          </div>
+
+          <!-- Tanggal Pinjam & Durasi / Batas Kembali -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Tanggal Pinjam *</label>
+              <input
+                v-model="newLoanForm.borrowDate"
+                type="date"
+                required
+                class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary/20 text-xs font-mono"
+              />
+            </div>
+
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Batas Tenggat Kembali *</label>
+              <input
+                v-model="newLoanForm.dueDate"
+                type="date"
+                required
+                class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary/20 text-xs font-mono"
+              />
+            </div>
+          </div>
+
+          <!-- Quick Duration Selector Buttons -->
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <label class="block font-bold text-slate-700">Pilihan Cepat Durasi:</label>
+              <span v-if="selectedDuration" class="text-[11px] font-bold text-primary bg-primary/10 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                <span class="material-symbols-outlined text-[13px]">done</span>
+                <span>Terpilih: {{ selectedDuration }} Hari</span>
+              </span>
+              <span v-else class="text-[11px] font-medium text-slate-400 italic">
+                (Kustom Tanggal)
+              </span>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                @click="setLoanDuration(3)"
+                class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 cursor-pointer active:scale-95"
+                :class="selectedDuration === 3
+                  ? 'bg-primary text-white shadow-md ring-2 ring-primary/30 scale-[1.02]'
+                  : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'"
+              >
+                <span v-if="selectedDuration === 3" class="material-symbols-outlined text-sm">check_circle</span>
+                <span v-else class="material-symbols-outlined text-sm text-slate-400">schedule</span>
+                <span>3 Hari (Ujian/Tugas)</span>
+              </button>
+
+              <button
+                type="button"
+                @click="setLoanDuration(7)"
+                class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 cursor-pointer active:scale-95"
+                :class="selectedDuration === 7
+                  ? 'bg-primary text-white shadow-md ring-2 ring-primary/30 scale-[1.02]'
+                  : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'"
+              >
+                <span v-if="selectedDuration === 7" class="material-symbols-outlined text-sm">check_circle</span>
+                <span v-else class="material-symbols-outlined text-sm text-slate-400">schedule</span>
+                <span>7 Hari (Standar Mahasiswa)</span>
+              </button>
+
+              <button
+                type="button"
+                @click="setLoanDuration(14)"
+                class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 cursor-pointer active:scale-95"
+                :class="selectedDuration === 14
+                  ? 'bg-primary text-white shadow-md ring-2 ring-primary/30 scale-[1.02]'
+                  : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'"
+              >
+                <span v-if="selectedDuration === 14" class="material-symbols-outlined text-sm">check_circle</span>
+                <span v-else class="material-symbols-outlined text-sm text-slate-400">schedule</span>
+                <span>14 Hari (Dosen/Skripsi)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Catatan Tambahan -->
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Catatan Tambahan (Opsional)</label>
+            <textarea
+              v-model="newLoanForm.notes"
+              rows="2"
+              placeholder="Catatan kondisi buku saat dipinjam, atau keterangan khusus..."
+              class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs leading-relaxed"
+            ></textarea>
+          </div>
+
+          <!-- Submit Buttons -->
+          <div class="pt-4 border-t border-slate-200 flex justify-end gap-3">
+            <button
+              type="button"
+              @click="isLoanModalOpen = false"
+              class="px-4 py-2 rounded-xl border border-slate-300 hover:bg-slate-100 font-semibold text-slate-700"
+            >
+              Batal
+            </button>
+            <button
+              type="submit"
+              :disabled="isSubmittingLoan"
+              class="px-6 py-2 rounded-xl bg-primary text-white hover:bg-primary-container font-bold shadow-sm flex items-center gap-1.5 disabled:opacity-50"
+            >
+              <span v-if="isSubmittingLoan" class="material-symbols-outlined text-sm animate-spin">progress_activity</span>
+              <span>{{ isSubmittingLoan ? 'Menyimpan...' : 'Simpan & Catat Peminjaman' }}</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL 4: GENERATE & EKSPOR LAPORAN PEMINJAMAN -->
+    <div
+      v-if="isExportModalOpen"
+      class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto"
+      @click.self="isExportModalOpen = false"
+    >
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-xl overflow-hidden my-8">
+        <!-- Header -->
+        <div class="bg-emerald-800 text-white p-5 px-6 flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <span class="material-symbols-outlined text-2xl text-emerald-200">description</span>
+            <div>
+              <h3 class="font-serif font-bold text-lg leading-tight">Generate Laporan Peminjaman</h3>
+              <p class="text-[11px] text-emerald-100">Ekspor data sirkulasi ke file Excel (.xlsx) atau PDF (.pdf)</p>
+            </div>
+          </div>
+          <button @click="isExportModalOpen = false" class="text-white/80 hover:text-white cursor-pointer">
+            <span class="material-symbols-outlined text-xl">close</span>
+          </button>
+        </div>
+
+        <!-- Form Body -->
+        <div class="p-6 sm:p-8 space-y-5 text-xs">
+          <!-- Rentang Tanggal Spesifik -->
+          <div>
+            <label class="block font-bold text-slate-800 mb-1.5 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-sm text-emerald-700">calendar_month</span>
+              <span>Periode Tanggal Peminjaman *</span>
+            </label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] text-slate-500 mb-1">Dari Tanggal Mulai:</label>
+                <input
+                  v-model="exportForm.startDate"
+                  type="date"
+                  class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-600/30 text-xs font-mono"
+                />
+              </div>
+
+              <div>
+                <label class="block text-[11px] text-slate-500 mb-1">Sampai Tanggal Akhir:</label>
+                <input
+                  v-model="exportForm.endDate"
+                  type="date"
+                  class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-600/30 text-xs font-mono"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Filter Status Transaksi -->
+          <div>
+            <label class="block font-bold text-slate-800 mb-1.5 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-sm text-emerald-700">tune</span>
+              <span>Filter Status Transaksi</span>
+            </label>
+            <select
+              v-model="exportForm.status"
+              class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-600/30 text-xs font-semibold text-slate-800"
+            >
+              <option value="ALL">Semua Status (Aktif, Terlambat, & Selesai)</option>
+              <option value="BORROWED">Hanya yang Sedang Dipinjam (Aktif)</option>
+              <option value="OVERDUE">Hanya yang Terlambat (Overdue)</option>
+              <option value="RETURNED">Hanya yang Sudah Dikembalikan (Selesai)</option>
+            </select>
+          </div>
+
+          <!-- Live Preview Data Matching Counter -->
+          <div class="p-4 rounded-2xl border transition-all" :class="exportMatchingLoans.length > 0 ? 'bg-emerald-50/80 border-emerald-200 text-emerald-950' : 'bg-amber-50 border-amber-200 text-amber-900'">
+            <div class="flex items-start gap-2.5">
+              <span class="material-symbols-outlined text-lg shrink-0" :class="exportMatchingLoans.length > 0 ? 'text-emerald-700' : 'text-amber-600'">
+                {{ exportMatchingLoans.length > 0 ? 'fact_check' : 'warning' }}
+              </span>
+              <div>
+                <div class="font-bold text-xs">
+                  {{ exportMatchingLoans.length }} Catatan Peminjaman Ditemukan
+                </div>
+                <p class="text-[11px] mt-0.5 leading-relaxed opacity-90">
+                  {{ exportMatchingLoans.length > 0
+                    ? `Data siap diekspor untuk periode ${formatIndoDate(exportForm.startDate)} s/d ${formatIndoDate(exportForm.endDate)}.`
+                    : 'Tidak ada data peminjaman yang cocok pada rentang tanggal dan status ini. Silakan sesuaikan kembali pilihan tanggal.' }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Export Buttons -->
+          <div class="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-end gap-3">
+            <button
+              type="button"
+              @click="isExportModalOpen = false"
+              class="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-slate-300 hover:bg-slate-100 font-semibold text-slate-700 cursor-pointer"
+            >
+              Batal
+            </button>
+
+            <!-- Download Excel -->
+            <button
+              type="button"
+              @click="handleExportExcel"
+              :disabled="exportMatchingLoans.length === 0"
+              class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 disabled:opacity-40 text-white font-bold transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <span class="material-symbols-outlined text-base">table_view</span>
+              <span>Download Excel (.xlsx)</span>
+            </button>
+
+            <!-- Download PDF -->
+            <button
+              type="button"
+              @click="handleExportPdf"
+              :disabled="exportMatchingLoans.length === 0"
+              class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 disabled:opacity-40 text-white font-bold transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <span class="material-symbols-outlined text-base">picture_as_pdf</span>
+              <span>Download PDF (.pdf)</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, watch } from 'vue'
+import { exportLoansToExcel, exportLoansToPdf } from '~/utils/loanExport'
 
 const { settings, fetchSettings, saveSettings, resetToDefault } = useSiteSettings()
 
@@ -1285,10 +2071,36 @@ const showPassword = ref(false)
 const loginError = ref('')
 const successMessage = ref('')
 
-// Navigasi Section Utama: website | books | genres
-const mainSection = ref<'website' | 'books' | 'genres'>('website')
+// Navigasi Section Utama: website | books | genres | loans
+const mainSection = ref<'website' | 'books' | 'genres' | 'loans'>('website')
 const websiteTab = ref<'navbar' | 'hero' | 'footer'>('navbar')
 const isSaving = ref(false)
+
+// State Sirkulasi & Peminjaman Buku
+const loansList = ref<any[]>([])
+const loanFilterStatus = ref<'ALL' | 'BORROWED' | 'OVERDUE' | 'RETURNED'>('BORROWED')
+const loanSearchQuery = ref('')
+const isLoanModalOpen = ref(false)
+const isSubmittingLoan = ref(false)
+const selectedDuration = ref<number | null>(7)
+
+// State Ekspor Laporan
+const isExportModalOpen = ref(false)
+const exportForm = reactive({
+  startDate: '',
+  endDate: '',
+  status: 'ALL'
+})
+
+const newLoanForm = reactive({
+  bookId: '',
+  borrowerName: '',
+  borrowerNim: '',
+  borrowerEmail: '',
+  borrowDate: '',
+  dueDate: '',
+  notes: ''
+})
 
 // State Form Pengaturan Website
 const siteForm = reactive({
@@ -1329,6 +2141,10 @@ const bookFilterCategory = ref('')
 const isBookModalOpen = ref(false)
 const editingBookId = ref<number | null>(null)
 const isSubmittingBook = ref(false)
+const bookModalError = ref('')
+const bookModalFormRef = ref<HTMLFormElement | null>(null)
+const bookTitleInputRef = ref<HTMLInputElement | null>(null)
+const bookAuthorInputRef = ref<HTMLInputElement | null>(null)
 
 // State Cover Upload & URL
 const coverInputMode = ref<'upload' | 'url'>('upload')
@@ -1369,6 +2185,122 @@ const categoryForm = reactive({
   description: '',
   location: 'Lantai 1',
   color: '#00236f'
+})
+
+// Pemilih Ikon Genre (Material Symbols)
+const isIconPickerOpen = ref(false)
+const iconSearchQuery = ref('')
+const selectedIconCategory = ref('Semua')
+
+const iconCategories = ['Semua', 'Umum', 'Sains & TI', 'Sosial & Hukum', 'Ekonomi', 'Sastra & Seni', 'Medis']
+
+const quickGenreIcons = [
+  { name: 'menu_book', label: 'Buku Umum' },
+  { name: 'auto_stories', label: 'Sastra & Fiksi' },
+  { name: 'terminal', label: 'Sains & Komputer' },
+  { name: 'public', label: 'Sosial & Politik' },
+  { name: 'trending_up', label: 'Ekonomi & Bisnis' },
+  { name: 'gavel', label: 'Ilmu Hukum' },
+  { name: 'history_edu', label: 'Humaniora & Sejarah' },
+  { name: 'medical_services', label: 'Kedokteran & Kesehatan' }
+]
+
+const availableGenreIcons = [
+  // Umum & Pustaka
+  { name: 'menu_book', label: 'Buku Umum & Koleksi', category: 'Umum' },
+  { name: 'auto_stories', label: 'Sastra, Fiksi & Puisi', category: 'Sastra & Seni' },
+  { name: 'library_books', label: 'Perpustakaan & Monograf', category: 'Umum' },
+  { name: 'collections_bookmark', label: 'Referensi & Kliping', category: 'Umum' },
+  { name: 'import_contacts', label: 'Katalog & Panduan', category: 'Umum' },
+  { name: 'school', label: 'Pendidikan & Pedagogi', category: 'Umum' },
+  { name: 'bookmark', label: 'Koleksi Pilihan / Kanon', category: 'Umum' },
+  { name: 'feed', label: 'Publikasi & Dokumen Resmi', category: 'Umum' },
+
+  // Sains & TI
+  { name: 'terminal', label: 'Sains Komputer & Informatika', category: 'Sains & TI' },
+  { name: 'code', label: 'Rekayasa Perangkat Lunak', category: 'Sains & TI' },
+  { name: 'memory', label: 'Sistem Embedded & IoT', category: 'Sains & TI' },
+  { name: 'precision_manufacturing', label: 'Robotika & Mekatronika', category: 'Sains & TI' },
+  { name: 'science', label: 'Sains Murni & Kimia', category: 'Sains & TI' },
+  { name: 'biotech', label: 'Biologi & Bioteknologi', category: 'Sains & TI' },
+  { name: 'engineering', label: 'Teknik & Rekayasa Mesin', category: 'Sains & TI' },
+  { name: 'calculate', label: 'Matematika & Statistika', category: 'Sains & TI' },
+  { name: 'rocket_launch', label: 'Astronomi & Antariksa', category: 'Sains & TI' },
+  { name: 'solar_power', label: 'Fisika & Energi Baru', category: 'Sains & TI' },
+  { name: 'database', label: 'Basis Data & Sistem Informasi', category: 'Sains & TI' },
+  { name: 'nature', label: 'Biologi Lingkungan & Ekologi', category: 'Sains & TI' },
+  { name: 'agriculture', label: 'Pertanian & Agroteknologi', category: 'Sains & TI' },
+
+  // Sosial, Politik & Hukum
+  { name: 'public', label: 'Ilmu Sosial & Politik', category: 'Sosial & Hukum' },
+  { name: 'gavel', label: 'Ilmu Hukum & Peradilan', category: 'Sosial & Hukum' },
+  { name: 'policy', label: 'Kebijakan Publik & Tata Kelola', category: 'Sosial & Hukum' },
+  { name: 'balance', label: 'Konstitusi & Keadilan', category: 'Sosial & Hukum' },
+  { name: 'diversity_3', label: 'Sosiologi & Antropologi', category: 'Sosial & Hukum' },
+  { name: 'shield', label: 'Ketahanan & Keamanan Negara', category: 'Sosial & Hukum' },
+  { name: 'handshake', label: 'Hubungan Internasional & Diplomasi', category: 'Sosial & Hukum' },
+  { name: 'record_voice_over', label: 'Komunikasi Massa & Public Relations', category: 'Sosial & Hukum' },
+  { name: 'newspaper', label: 'Jurnalistik & Pers Mahasiswa', category: 'Sosial & Hukum' },
+  { name: 'travel_explore', label: 'Geografi & Geopolitik', category: 'Sosial & Hukum' },
+
+  // Ekonomi & Bisnis
+  { name: 'trending_up', label: 'Ekonomi Makro & Bisnis', category: 'Ekonomi' },
+  { name: 'payments', label: 'Keuangan & Fiskal', category: 'Ekonomi' },
+  { name: 'account_balance', label: 'Perbankan & Moneter', category: 'Ekonomi' },
+  { name: 'storefront', label: 'Manajemen Bisnis & Pemasaran', category: 'Ekonomi' },
+  { name: 'analytics', label: 'Riset Pasar & Ekonometrika', category: 'Ekonomi' },
+  { name: 'savings', label: 'Akuntansi & Perpajakan', category: 'Ekonomi' },
+
+  // Sastra, Humaniora & Seni
+  { name: 'history_edu', label: 'Humaniora, Sejarah & Arkeologi', category: 'Sastra & Seni' },
+  { name: 'palette', label: 'Seni Rupa & Desain Komunikasi Visual', category: 'Sastra & Seni' },
+  { name: 'architecture', label: 'Arsitektur & Perencanaan Wilayah', category: 'Sastra & Seni' },
+  { name: 'language', label: 'Linguistik & Ilmu Budaya', category: 'Sastra & Seni' },
+  { name: 'music_note', label: 'Seni Musik & Komposisi', category: 'Sastra & Seni' },
+  { name: 'theater_comedy', label: 'Seni Pertunjukan, Teater & Film', category: 'Sastra & Seni' },
+  { name: 'lightbulb', label: 'Filsafat, Logika & Etika', category: 'Sastra & Seni' },
+  { name: 'mosque', label: 'Studi Agama, Teologi & Peradaban', category: 'Sastra & Seni' },
+
+  // Kedokteran & Kesehatan
+  { name: 'medical_services', label: 'Kedokteran Klinis & Bedah', category: 'Medis' },
+  { name: 'health_and_safety', label: 'Kesehatan Masyarakat & Epidemiologi', category: 'Medis' },
+  { name: 'local_pharmacy', label: 'Farmasi & Farmakologi', category: 'Medis' },
+  { name: 'psychology', label: 'Psikologi & Ilmu Perilaku', category: 'Medis' },
+  { name: 'healing', label: 'Keperawatan & Fisioterapi', category: 'Medis' },
+  { name: 'fitness_center', label: 'Ilmu Keolahragaan & Kesehatan Fisik', category: 'Medis' }
+]
+
+const filteredGenreIcons = computed(() => {
+  let list = availableGenreIcons
+  if (selectedIconCategory.value !== 'Semua') {
+    list = list.filter(i => i.category === selectedIconCategory.value)
+  }
+  if (iconSearchQuery.value.trim()) {
+    const q = iconSearchQuery.value.toLowerCase().trim()
+    list = list.filter(i =>
+      i.label.toLowerCase().includes(q) ||
+      i.name.toLowerCase().includes(q) ||
+      i.category.toLowerCase().includes(q)
+    )
+  }
+  return list
+})
+
+const getSelectedIconLabel = computed(() => {
+  const found = availableGenreIcons.find(i => i.name === categoryForm.icon)
+  return found ? found.label : (categoryForm.icon || 'Buku Umum')
+})
+
+// Auto-generate slug dari nama jika belum diisi manual
+watch(() => categoryForm.name, (newName) => {
+  if (!editingCategoryId.value && newName) {
+    categoryForm.slug = newName
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/[\s_-]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+  }
 })
 
 // Filter Buku Admin
@@ -1425,7 +2357,8 @@ const loadData = async () => {
   try {
     const [booksRes, catsRes]: any = await Promise.all([
       $fetch('/api/books'),
-      $fetch('/api/categories')
+      $fetch('/api/categories'),
+      loadLoans()
     ])
     if (booksRes && booksRes.data) {
       booksList.value = booksRes.data
@@ -1434,7 +2367,7 @@ const loadData = async () => {
       categoriesList.value = catsRes.data
     }
   } catch (err) {
-    console.error('Gagal memuat data buku/genre:', err)
+    console.error('Gagal memuat data buku/genre/peminjaman:', err)
   }
 }
 
@@ -1667,6 +2600,7 @@ const handleCoverDrop = (e: DragEvent) => {
 // BUKU: Modal & CRUD
 const openAddBookModal = () => {
   editingBookId.value = null
+  bookModalError.value = ''
   coverInputMode.value = 'upload'
   uploadCoverError.value = ''
   Object.assign(bookForm, {
@@ -1692,6 +2626,7 @@ const openAddBookModal = () => {
 
 const openEditBookModal = (book: any) => {
   editingBookId.value = book.id
+  bookModalError.value = ''
   uploadCoverError.value = ''
   coverInputMode.value = book.coverUrl && book.coverUrl.startsWith('http') ? 'url' : 'upload'
   Object.assign(bookForm, {
@@ -1716,6 +2651,23 @@ const openEditBookModal = (book: any) => {
 }
 
 const saveBookForm = async () => {
+  bookModalError.value = ''
+
+  // Validasi wajib isi di sisi client
+  if (!bookForm.title || !bookForm.title.trim()) {
+    bookModalError.value = 'Judul Buku wajib diisi! Mohon masukkan judul buku di bagian atas form.'
+    bookModalFormRef.value?.scrollTo({ top: 0, behavior: 'smooth' })
+    setTimeout(() => { bookTitleInputRef.value?.focus() }, 150)
+    return
+  }
+
+  if (!bookForm.author || !bookForm.author.trim()) {
+    bookModalError.value = 'Nama Pengarang / Penulis wajib diisi! Mohon lengkapi nama penulis buku.'
+    bookModalFormRef.value?.scrollTo({ top: 0, behavior: 'smooth' })
+    setTimeout(() => { bookAuthorInputRef.value?.focus() }, 150)
+    return
+  }
+
   isSubmittingBook.value = true
   try {
     if (editingBookId.value) {
@@ -1729,13 +2681,20 @@ const saveBookForm = async () => {
         method: 'POST',
         body: bookForm
       })
-      successMessage.value = `Buku baru "${bookForm.title}" berhasil ditambahkan!`
+      successMessage.value = `Buku baru "${bookForm.title}" berhasil ditambahkan ke katalog!`
     }
     isBookModalOpen.value = false
     await loadData()
     setTimeout(() => { successMessage.value = '' }, 5000)
   } catch (err: any) {
-    alert(err?.data?.message || err?.message || 'Gagal menyimpan buku.')
+    const errorMsg =
+      err?.data?.statusMessage ||
+      err?.data?.message ||
+      err?.statusMessage ||
+      err?.message ||
+      'Gagal menyimpan data buku. Pastikan server aktif dan form terisi dengan benar.'
+    bookModalError.value = errorMsg
+    bookModalFormRef.value?.scrollTo({ top: 0, behavior: 'smooth' })
   } finally {
     isSubmittingBook.value = false
   }
@@ -1756,6 +2715,9 @@ const confirmDeleteBook = async (book: any) => {
 // GENRE: Modal & CRUD
 const openAddCategoryModal = () => {
   editingCategoryId.value = null
+  isIconPickerOpen.value = false
+  iconSearchQuery.value = ''
+  selectedIconCategory.value = 'Semua'
   Object.assign(categoryForm, {
     name: '',
     slug: '',
@@ -1769,6 +2731,9 @@ const openAddCategoryModal = () => {
 
 const openEditCategoryModal = (cat: any) => {
   editingCategoryId.value = cat.id
+  isIconPickerOpen.value = false
+  iconSearchQuery.value = ''
+  selectedIconCategory.value = 'Semua'
   Object.assign(categoryForm, {
     name: cat.name,
     slug: cat.slug,
@@ -1815,6 +2780,319 @@ const confirmDeleteCategory = async (cat: any) => {
     setTimeout(() => { successMessage.value = '' }, 5000)
   } catch (err: any) {
     alert(err?.data?.message || err?.message || 'Gagal menghapus genre.')
+  }
+}
+
+// ==========================================
+// SIRKULASI & PEMINJAMAN BUKU (ADMIN)
+// ==========================================
+const formatIndoDate = (dateStr: string | Date | undefined) => {
+  if (!dateStr) return '-'
+  const d = new Date(dateStr)
+  if (isNaN(d.getTime())) return '-'
+  return d.toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric'
+  })
+}
+
+const isOverdue = (loan: any): boolean => {
+  if (!loan || loan.status === 'RETURNED' || !loan.dueDate) return false
+  const due = new Date(loan.dueDate)
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  return due < today
+}
+
+const getOverdueDays = (loan: any): number => {
+  if (!loan || !loan.dueDate) return 0
+  const due = new Date(loan.dueDate).getTime()
+  const now = new Date().getTime()
+  const diffTime = now - due
+  return Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)))
+}
+
+const getRemainingDays = (loan: any): number => {
+  if (!loan || !loan.dueDate) return 0
+  const due = new Date(loan.dueDate).getTime()
+  const now = new Date().getTime()
+  const diffTime = due - now
+  return Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)))
+}
+
+const availableBooksForLoan = computed(() => {
+  return booksList.value.filter((b) => Number(b.available) > 0)
+})
+
+const activeLoansCount = computed(() => {
+  return loansList.value.filter((l) => l.status !== 'RETURNED').length
+})
+
+const overdueLoansCount = computed(() => {
+  return loansList.value.filter((l) => isOverdue(l)).length
+})
+
+const returnedLoansCount = computed(() => {
+  return loansList.value.filter((l) => l.status === 'RETURNED').length
+})
+
+const filteredLoans = computed(() => {
+  return loansList.value.filter((loan) => {
+    // Filter status tab
+    if (loanFilterStatus.value === 'BORROWED') {
+      if (loan.status === 'RETURNED') return false
+    } else if (loanFilterStatus.value === 'OVERDUE') {
+      if (!isOverdue(loan)) return false
+    } else if (loanFilterStatus.value === 'RETURNED') {
+      if (loan.status !== 'RETURNED') return false
+    }
+
+    // Filter pencarian teks
+    if (loanSearchQuery.value.trim()) {
+      const q = loanSearchQuery.value.toLowerCase().trim()
+      const matchBorrower =
+        loan.borrowerName?.toLowerCase().includes(q) ||
+        loan.borrowerNim?.toLowerCase().includes(q)
+      const matchBook =
+        loan.book?.title?.toLowerCase().includes(q) ||
+        loan.book?.isbn?.toLowerCase().includes(q) ||
+        loan.book?.callNumber?.toLowerCase().includes(q)
+      if (!matchBorrower && !matchBook) return false
+    }
+
+    return true
+  })
+})
+
+// Pagination Sirkulasi Peminjaman (10 data per halaman & tombol Next)
+const loanCurrentPage = ref(1)
+const loanPageSize = 10
+
+const loanTotalPages = computed(() => {
+  return Math.ceil(filteredLoans.value.length / loanPageSize) || 1
+})
+
+const paginatedLoans = computed(() => {
+  const start = (loanCurrentPage.value - 1) * loanPageSize
+  return filteredLoans.value.slice(start, start + loanPageSize)
+})
+
+const goToLoanPage = (page: number) => {
+  if (page < 1 || page > loanTotalPages.value) return
+  loanCurrentPage.value = page
+}
+
+// Reset halaman ke 1 jika filter atau pencarian peminjaman berubah
+watch([loanSearchQuery, loanFilterStatus], () => {
+  loanCurrentPage.value = 1
+})
+
+const loadLoans = async () => {
+  try {
+    const res: any = await $fetch('/api/loans')
+    if (res && res.data) {
+      loansList.value = res.data
+    }
+  } catch (err) {
+    console.error('Gagal memuat data peminjaman:', err)
+  }
+}
+
+const setLoanDuration = (days: number) => {
+  selectedDuration.value = days
+  const baseDate = newLoanForm.borrowDate ? new Date(newLoanForm.borrowDate) : new Date()
+  const due = new Date(baseDate)
+  due.setDate(due.getDate() + Number(days))
+  newLoanForm.dueDate = due.toISOString().split('T')[0]
+}
+
+// Sinkronisasi status tombol durasi jika admin mengubah input tanggal secara manual
+watch(
+  [() => newLoanForm.borrowDate, () => newLoanForm.dueDate],
+  ([borrow, due]) => {
+    if (!borrow || !due) {
+      selectedDuration.value = null
+      return
+    }
+    const b = new Date(borrow).getTime()
+    const d = new Date(due).getTime()
+    const diffDays = Math.round((d - b) / (1000 * 60 * 60 * 24))
+    if ([3, 7, 14].includes(diffDays)) {
+      selectedDuration.value = diffDays
+    } else {
+      selectedDuration.value = null
+    }
+  }
+)
+
+const openAddLoanModal = () => {
+  selectedDuration.value = 7
+  const today = new Date().toISOString().split('T')[0]
+  const defaultDue = new Date()
+  defaultDue.setDate(defaultDue.getDate() + 7)
+
+  newLoanForm.bookId = availableBooksForLoan.value[0]?.id || ''
+  newLoanForm.borrowerName = ''
+  newLoanForm.borrowerNim = ''
+  newLoanForm.borrowerEmail = ''
+  newLoanForm.borrowDate = today
+  newLoanForm.dueDate = defaultDue.toISOString().split('T')[0]
+  newLoanForm.notes = ''
+
+  isLoanModalOpen.value = true
+}
+
+const saveLoanForm = async () => {
+  if (!newLoanForm.bookId || !newLoanForm.borrowerName.trim() || !newLoanForm.borrowerNim.trim()) {
+    alert('Harap pilih buku, isi Nama Pemustaka, dan NIM.')
+    return
+  }
+
+  isSubmittingLoan.value = true
+  try {
+    const res: any = await $fetch('/api/loans', {
+      method: 'POST',
+      body: newLoanForm
+    })
+
+    if (res && res.success) {
+      successMessage.value = res.message || 'Peminjaman buku berhasil dicatat!'
+      isLoanModalOpen.value = false
+      await Promise.all([loadLoans(), loadData()])
+      setTimeout(() => { successMessage.value = '' }, 5000)
+    }
+  } catch (err: any) {
+    alert(err?.data?.message || err?.message || 'Gagal mencatat peminjaman.')
+  } finally {
+    isSubmittingLoan.value = false
+  }
+}
+
+const handleReturnLoan = async (loan: any) => {
+  const confirmMsg = `Tandai buku "${loan.book?.title || 'buku'}" yang dipinjam oleh ${loan.borrowerName} telah dikembalikan? Stok ketersediaan buku akan otomatis bertambah 1.`
+  if (!confirm(confirmMsg)) return
+
+  try {
+    const res: any = await $fetch(`/api/loans/${loan.id}`, {
+      method: 'PATCH',
+      body: { action: 'return' }
+    })
+    successMessage.value = res?.message || 'Buku berhasil ditandai telah dikembalikan!'
+    await Promise.all([loadLoans(), loadData()])
+    setTimeout(() => { successMessage.value = '' }, 5000)
+  } catch (err: any) {
+    alert(err?.data?.message || err?.message || 'Gagal mengembalikan buku.')
+  }
+}
+
+const handleExtendLoan = async (loan: any) => {
+  if (!confirm(`Perpanjang batas waktu peminjaman buku ini sebanyak 7 hari ke depan?`)) return
+
+  try {
+    const res: any = await $fetch(`/api/loans/${loan.id}`, {
+      method: 'PATCH',
+      body: { action: 'extend', additionalDays: 7 }
+    })
+    successMessage.value = res?.message || 'Tenggat peminjaman berhasil diperpanjang!'
+    await loadLoans()
+    setTimeout(() => { successMessage.value = '' }, 5000)
+  } catch (err: any) {
+    alert(err?.data?.message || err?.message || 'Gagal memperpanjang batas waktu.')
+  }
+}
+
+const handleDeleteLoan = async (loan: any) => {
+  const isCurrentlyActive = loan.status !== 'RETURNED'
+  const confirmMsg = isCurrentlyActive
+    ? `Hapus transaksi peminjaman ini? Karena buku masih berstatus aktif dipinjam, stok buku akan dikembalikan otomatis.`
+    : `Hapus catatan riwayat peminjaman ini secara permanen?`
+
+  if (!confirm(confirmMsg)) return
+
+  try {
+    const res: any = await $fetch(`/api/loans/${loan.id}`, {
+      method: 'DELETE'
+    })
+    successMessage.value = res?.message || 'Catatan peminjaman berhasil dihapus.'
+    await Promise.all([loadLoans(), loadData()])
+    setTimeout(() => { successMessage.value = '' }, 5000)
+  } catch (err: any) {
+    alert(err?.data?.message || err?.message || 'Gagal menghapus peminjaman.')
+  }
+}
+
+// ==========================================
+// EKSPOR LAPORAN SIRKULASI (EXCEL & PDF)
+// ==========================================
+const openExportModal = () => {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  const day = String(now.getDate()).padStart(2, '0')
+
+  exportForm.startDate = `${year}-${month}-01`
+  exportForm.endDate = `${year}-${month}-${day}`
+  exportForm.status = 'ALL'
+  isExportModalOpen.value = true
+}
+
+const exportMatchingLoans = computed(() => {
+  if (!exportForm.startDate || !exportForm.endDate) return []
+
+  const start = new Date(exportForm.startDate)
+  start.setHours(0, 0, 0, 0)
+  const end = new Date(exportForm.endDate)
+  end.setHours(23, 59, 59, 999)
+
+  return loansList.value.filter((loan) => {
+    // Filter rentang tanggal pinjam
+    const borrowTime = new Date(loan.borrowDate).getTime()
+    if (isNaN(borrowTime) || borrowTime < start.getTime() || borrowTime > end.getTime()) {
+      return false
+    }
+
+    // Filter status transaksi
+    if (exportForm.status === 'BORROWED') {
+      if (loan.status === 'RETURNED') return false
+    } else if (exportForm.status === 'OVERDUE') {
+      if (!isOverdue(loan)) return false
+    } else if (exportForm.status === 'RETURNED') {
+      if (loan.status !== 'RETURNED') return false
+    }
+
+    return true
+  })
+})
+
+const getStatusLabel = (status: string) => {
+  if (status === 'BORROWED') return 'Sedang Dipinjam'
+  if (status === 'OVERDUE') return 'Terlambat (Overdue)'
+  if (status === 'RETURNED') return 'Sudah Dikembalikan'
+  return 'Semua Status'
+}
+
+const handleExportExcel = () => {
+  try {
+    exportLoansToExcel(exportMatchingLoans.value, {
+      startDate: exportForm.startDate,
+      endDate: exportForm.endDate,
+      statusLabel: getStatusLabel(exportForm.status)
+    })
+  } catch (err: any) {
+    alert(err?.message || 'Gagal mengekspor laporan ke Excel.')
+  }
+}
+
+const handleExportPdf = () => {
+  try {
+    exportLoansToPdf(exportMatchingLoans.value, {
+      startDate: exportForm.startDate,
+      endDate: exportForm.endDate,
+      statusLabel: getStatusLabel(exportForm.status)
+    })
+  } catch (err: any) {
+    alert(err?.message || 'Gagal mengekspor laporan ke PDF.')
   }
 }
 

@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
   const idParam = getRouterParam(event, 'id')
   const id = Number(idParam)
   if (!id || isNaN(id)) {
-    return createError({
+    throw createError({
       statusCode: 400,
       statusMessage: 'ID buku tidak valid'
     })
@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event)
     const updated = await updateBook(id, body)
     if (!updated) {
-      return createError({
+      throw createError({
         statusCode: 404,
         statusMessage: 'Buku tidak ditemukan'
       })
@@ -26,7 +26,10 @@ export default defineEventHandler(async (event) => {
       data: updated
     }
   } catch (err: any) {
-    return createError({
+    if (err.statusCode) {
+      throw err
+    }
+    throw createError({
       statusCode: 500,
       statusMessage: err.message || 'Gagal memperbarui data buku'
     })

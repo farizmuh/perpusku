@@ -155,6 +155,15 @@ export const createBook = async (data: Partial<BookData>): Promise<BookData> => 
 
   const matchedCat = categories.find((c) => c.id === Number(data.categoryId)) || categories[0]
 
+  const safeNum = (val: any, fallback: number) => {
+    if (val === undefined || val === null || val === '') return fallback
+    const n = Number(val)
+    return isNaN(n) ? fallback : n
+  }
+
+  const stockVal = safeNum(data.stock, 3)
+  const availableVal = safeNum(data.available, stockVal)
+
   const newBook: BookData = {
     id: newId,
     title: data.title?.trim() || 'Judul Buku Baru',
@@ -162,16 +171,16 @@ export const createBook = async (data: Partial<BookData>): Promise<BookData> => 
     author: data.author?.trim() || 'Penulis Buku',
     isbn: data.isbn?.trim() || `978-${Math.floor(1000000000 + Math.random() * 9000000000)}`,
     publisher: data.publisher?.trim() || 'Penerbit Kampus',
-    year: Number(data.year) || new Date().getFullYear(),
-    pages: Number(data.pages) || 250,
+    year: safeNum(data.year, new Date().getFullYear()),
+    pages: safeNum(data.pages, 250),
     callNumber: data.callNumber?.trim() || `000.${newId} PER`,
     shelfLocation: data.shelfLocation?.trim() || 'Lantai 1 - Rak Umum',
     coverUrl: data.coverUrl?.trim() || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80',
     synopsis: data.synopsis?.trim() || 'Sinopsis dan deskripsi ringkas isi buku.',
-    stock: Number(data.stock) ?? 3,
-    available: Number(data.available) ?? 3,
-    rating: Number(data.rating) || 4.8,
-    reviewsCount: Number(data.reviewsCount) || 10,
+    stock: stockVal,
+    available: availableVal,
+    rating: safeNum(data.rating, 4.8),
+    reviewsCount: safeNum(data.reviewsCount, 10),
     isFeatured: Boolean(data.isFeatured),
     isLiterature: Boolean(data.isLiterature),
     discipline: data.discipline?.trim() || matchedCat.name,

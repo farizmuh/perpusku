@@ -173,7 +173,7 @@
     "coverUrl": "https://images.unsplash.com/photo-1476275466078-4007374efbbe?auto=format&fit=crop&w=600&q=80",
     "synopsis": "Novel realisme magis peraih apresiasi sastra internasional. Berkisah tentang Dewi Ayu yang bangkit dari kubur di kota fiktif Halimunda, mengungkap sejarah kelam kekerasan kolonialisme dan kutukan turun-temurun.",
     "stock": 5,
-    "available": 4,
+    "available": 0,
     "rating": 4.8,
     "reviewsCount": 67,
     "isFeatured": true,
@@ -187,8 +187,7 @@
       "description": "Karya sastra kanonik Indonesia, novel fiksi filosofis, antologi puisi, dan prosa dunia.",
       "icon": "auto_stories",
       "color": "#d97706",
-      "createdAt": "2026-10-15T01:28:50.709Z",
-      "updatedAt": "2026-10-15T01:28:50.709Z"
+      "location": "Lantai 3 - Rak Sastra"
     }
   },
   {
@@ -315,8 +314,7 @@
       "description": "Koleksi sosiologi, ilmu pemerintahan, komunikasi, dan studi kebijakan publik kontemporer.",
       "icon": "public",
       "color": "#0284c7",
-      "createdAt": "2026-10-15T01:28:50.700Z",
-      "updatedAt": "2026-10-15T01:28:50.700Z"
+      "location": "Lantai 1 - Ruang Baca A"
     }
   },
   {
@@ -475,8 +473,7 @@
       "description": "Eksplorasi etika, sejarah peradaban, epistemologi, arkeologi, dan studi kebudayaan.",
       "icon": "history_edu",
       "color": "#dc2626",
-      "createdAt": "2026-10-15T01:28:50.716Z",
-      "updatedAt": "2026-10-15T01:28:50.716Z"
+      "location": "Lantai 3 - Sayap Utara"
     }
   },
   {
@@ -509,6 +506,37 @@
       "color": "#0d9488",
       "createdAt": "2026-10-15T01:28:50.719Z",
       "updatedAt": "2026-10-15T01:28:50.719Z"
+    }
+  },
+  {
+    "id": 17,
+    "title": "Book Of Life",
+    "slug": "book-of-life",
+    "author": "Fariz Kkk",
+    "isbn": "978-1850044494",
+    "publisher": "Penerbit Kampus",
+    "year": 2026,
+    "pages": 280,
+    "callNumber": "000.17 PER",
+    "shelfLocation": "Lantai 1 - Rak Umum",
+    "coverUrl": "/uploads/books/1792116288913-Cokelat_dan_Emas_Elegan_Hari_Batik_Instagram_Post_webp.webp",
+    "synopsis": "buku tentang kehidupan",
+    "stock": 3,
+    "available": 3,
+    "rating": 4.8,
+    "reviewsCount": 10,
+    "isFeatured": false,
+    "isLiterature": true,
+    "discipline": "Sains & Teknologi",
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "AGAMAKU AGAMAMU",
+      "slug": "agamaku-agamamu",
+      "description": "",
+      "icon": "mosque",
+      "color": "#cb3efe",
+      "location": "Lantai 1 - Ruang Umum"
     }
   }
 ]
