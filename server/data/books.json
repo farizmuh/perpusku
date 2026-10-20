@@ -173,7 +173,7 @@
     "coverUrl": "https://images.unsplash.com/photo-1476275466078-4007374efbbe?auto=format&fit=crop&w=600&q=80",
     "synopsis": "Novel realisme magis peraih apresiasi sastra internasional. Berkisah tentang Dewi Ayu yang bangkit dari kubur di kota fiktif Halimunda, mengungkap sejarah kelam kekerasan kolonialisme dan kutukan turun-temurun.",
     "stock": 5,
-    "available": 0,
+    "available": 1,
     "rating": 4.8,
     "reviewsCount": 67,
     "isFeatured": true,
@@ -537,6 +537,37 @@
       "icon": "mosque",
       "color": "#cb3efe",
       "location": "Lantai 1 - Ruang Umum"
+    }
+  },
+  {
+    "id": 18,
+    "title": "To be hero",
+    "slug": "to-be-hero",
+    "author": "Wahyu",
+    "isbn": "978-8723242267",
+    "publisher": "Penerbit Kampus",
+    "year": 2020,
+    "pages": 10,
+    "callNumber": "000.18 PER",
+    "shelfLocation": "Lantai 1 - Ruang Umum",
+    "coverUrl": "/uploads/books/1792127065278-WhatsApp_Image_2025-09-24_at_11_22_05_1940f6af_webp.webp",
+    "synopsis": "cscasqwsdadca",
+    "stock": 3,
+    "available": 3,
+    "rating": 4.8,
+    "reviewsCount": 10,
+    "isFeatured": false,
+    "isLiterature": false,
+    "discipline": "Ilmu Sosial & Politik",
+    "categoryId": 2,
+    "category": {
+      "id": 2,
+      "name": "Ilmu Sosial & Politik",
+      "slug": "ilmu-sosial-dan-politik",
+      "description": "Koleksi sosiologi, ilmu pemerintahan, komunikasi, dan studi kebijakan publik kontemporer.",
+      "icon": "public",
+      "color": "#0284c7",
+      "location": "Lantai 1 - Ruang Baca A"
     }
   }
 ]
